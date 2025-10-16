@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Email - SageStudy</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="verify-page">
+<div class="min-vh-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <!-- 验证图标 -->
+                <div class="text-center mb-4">
+                    <div class="verification-icon bg-white rounded-circle mx-auto mb-3 shadow-lg d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                        <i class="bi bi-envelope-check-fill text-primary" style="font-size: 3rem;"></i>
+                    </div>
+                    <h1 class="text-white fw-bold mb-2">Verify Your Email</h1>
+                    <p class="text-white opacity-75">We've sent a 6-digit code to your email address</p>
+                </div>
+
+                <!-- 验证表单 -->
+                <div class="card shadow-lg border-0" style="border-radius: 20px;">
+                    <div class="card-body p-4">
+                        <div class="alert alert-info border-0 mb-4" style="border-radius: 12px;">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <small>Check your email inbox and enter the verification code below</small>
+                            </div>
+                        </div>
+
+                        <form id="verifyForm">
+                            <div class="mb-4">
+                                <label class="form-label fw-semibold text-center d-block mb-3">
+                                    <i class="bi bi-shield-check me-2 text-primary"></i>Enter 6-Digit Code
+                                </label>
+
+                                <!-- 验证码输入框 -->
+                                <div class="d-flex justify-content-center gap-2" id="codeInputs">
+                                    <input type="text"
+                                           class="form-control text-center fw-bold"
+                                           maxlength="1"
+                                           style="width: 50px; height: 60px; font-size: 1.5rem; border-radius: 12px;"
+                                           oninput="moveToNext(this, 0)"
+                                           onkeydown="handleBackspace(this, 0)"
+                                           aria-label="Digit 1">
+                                    <input type="text"
+                                           class="form-control text-center fw-bold"
+                                           maxlength="1"
+                                           style="width: 50px; height: 60px; font-size: 1.5rem; border-radius: 12px;"
+                                           oninput="moveToNext(this, 1)"
+                                           onkeydown="handleBackspace(this, 1)"
+                                           aria-label="Digit 2">
+                                    <input type="text"
+                                           class="form-control text-center fw-bold"
+                                           maxlength="1"
+                                           style="width: 50px; height: 60px; font-size: 1.5rem; border-radius: 12px;"
+                                           oninput="moveToNext(this, 2)"
+                                           onkeydown="handleBackspace(this, 2)"
+                                           aria-label="Digit 3">
+                                    <input type="text"
+                                           class="form-control text-center fw-bold"
+                                           maxlength="1"
+                                           style="width: 50px; height: 60px; font-size: 1.5rem; border-radius: 12px;"
+                                           oninput="moveToNext(this, 3)"
+                                           onkeydown="handleBackspace(this, 3)"
+                                           aria-label="Digit 4">
+                                    <input type="text"
+                                           class="form-control text-center fw-bold"
+                                           maxlength="1"
+                                           style="width: 50px; height: 60px; font-size: 1.5rem; border-radius: 12px;"
+                                           oninput="moveToNext(this, 4)"
+                                           onkeydown="handleBackspace(this, 4)"
+                                           aria-label="Digit 5">
+                                    <input type="text"
+                                           class="form-control text-center fw-bold"
+                                           maxlength="1"
+                                           style="width: 50px; height: 60px; font-size: 1.5rem; border-radius: 12px;"
+                                           oninput="moveToNext(this, 5)"
+                                           onkeydown="handleBackspace(this, 5)"
+                                           aria-label="Digit 6">
+                                </div>
+                            </div>
+
+                            <button type="submit"
+                                    class="btn btn-primary btn-lg w-100 mb-3"
+                                    style="border-radius: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;"
+                                    onclick="event.preventDefault(); verifyCode()">
+                                <i class="bi bi-check-circle me-2"></i>
+                                Verify Email
+                            </button>
+
+                            <!-- 重新发送 -->
+                            <div class="text-center">
+                                <p class="text-muted mb-2">Didn't receive the code?</p>
+                                <button type="button"
+                                        class="btn btn-outline-primary"
+                                        style="border-radius: 12px;"
+                                        onclick="resendCode()">
+                                    <i class="bi bi-arrow-clockwise me-2"></i>
+                                    Resend Code
+                                </button>
+                            </div>
+
+                            <!-- 倒计时 -->
+                            <div class="text-center mt-3">
+                                <small class="text-muted">
+                                    Resend available in <span id="countdown" class="fw-bold text-primary">60</span> seconds
+                                </small>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 返回登录 -->
+                <div class="text-center mt-4">
+                    <a href="login.html" class="text-white text-decoration-none opacity-75">
+                        <i class="bi bi-arrow-left me-2"></i>
+                        Back to Login
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let countdownTimer;
+    let timeLeft = 60;
+
+    // 启动倒计时
+    function startCountdown() {
+        const countdownElement = document.getElementById('countdown');
+        const resendButton = document.querySelector('.btn-outline-primary');
+
+        resendButton

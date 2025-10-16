@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile - SageStudy</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<!-- 顶部标题栏 -->
+<div class="top-header bg-gradient-primary">
+  <div class="container py-3">
+    <div class="d-flex align-items-center">
+      <a href="settings.html" class="text-white me-3" aria-label="Back to settings">
+        <i class="bi bi-arrow-left" style="font-size: 1.2rem;"></i>
+      </a>
+      <h5 class="text-white mb-0">
+        <i class="bi bi-person-circle"></i> Profile
+      </h5>
+    </div>
+  </div>
+</div>
+
+<!-- 主要内容 -->
+<div class="container mt-4 pb-5">
+  <!-- 用户头像和基本信息 -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body text-center">
+      <div class="position-relative d-inline-block mb-3">
+        <div class="user-avatar bg-primary rounded-circle mx-auto" style="width: 120px; height: 120px; display: flex; align-items: center; justify-content: center;">
+          <i class="bi bi-person-fill text-white" style="font-size: 4rem;"></i>
+        </div>
+        <button class="btn btn-sm btn-primary rounded-circle position-absolute bottom-0 end-0" style="width: 36px; height: 36px;">
+          <i class="bi bi-camera"></i>
+        </button>
+      </div>
+      <h5 class="mb-1">Student User</h5>
+      <p class="text-muted mb-0">Vocabulary Enthusiast</p>
+    </div>
+  </div>
+
+  <!-- 个人信息表单 -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h6 class="card-title mb-3">
+        <i class="bi bi-person-lines-fill"></i> Personal Information
+      </h6>
+
+      <form id="profileForm">
+        <div class="mb-3">
+          <label for="fullName" class="form-label">Full Name</label>
+          <input type="text" class="form-control" id="fullName" value="Student User" required>
+        </div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label">Email Address</label>
+          <input type="email" class="form-control" id="email" value="student@example.com" required>
+          <div class="form-text">
+            <i class="bi bi-shield-check text-success me-1"></i>
+            Verified email address
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="birthDate" class="form-label">Date of Birth</label>
+          <input type="date" class="form-control" id="birthDate" value="1995-06-15">
+        </div>
+
+        <div class="mb-3">
+          <label for="location" class="form-label">Location</label>
+          <select class="form-select" id="location">
+            <option value="">Select your location</option>
+            <option value="canada" selected>Canada</option>
+            <option value="usa">United States</option>
+            <option value="uk">United Kingdom</option>
+            <option value="australia">Australia</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="nativeLanguage" class="form-label">Native Language</label>
+          <select class="form-select" id="nativeLanguage">
+            <option value="">Select your native language</option>
+            <option value="chinese" selected>Chinese (Mandarin)</option>
+            <option value="spanish">Spanish</option>
+            <option value="french">French</option>
+            <option value="german">German</option>
+            <option value="japanese">Japanese</option>
+            <option value="korean">Korean</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="englishLevel" class="form-label">English Level</label>
+          <select class="form-select" id="englishLevel">
+            <option value="beginner">Beginner (A1-A2)</option>
+            <option value="intermediate" selected>Intermediate (B1-B2)</option>
+            <option value="advanced">Advanced (C1-C2)</option>
+            <option value="native">Native Speaker</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-check-lg me-2"></i>
+          Save Changes
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 学习偏好 -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h6 class="card-title mb-3">
+        <i class="bi bi-gear-fill"></i> Learning Preferences
+      </h6>
+
+      <form id="preferencesForm">
+        <div class="mb-3">
+          <label for="dailyGoal" class="form-label">Daily Learning Goal</label>
+          <div class="d-flex align-items-center">
+            <input type="range" class="form-range me-3" id="dailyGoal" min="10" max="50" step="5" value="20">
+            <span class="fw-bold text-primary" id="goalValue">20</span>
+            <small class="text-muted ms-1">words/day</small>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Notification Preferences</label>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="dailyReminder" checked>
+            <label class="form-check-label" for="dailyReminder">
+              Daily learning reminders
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="streakReminder" checked>
+            <label class="form-check-label" for="streakReminder">
+              Streak maintenance alerts
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="achievementAlert">
+            <label class="form-check-label" for="achievementAlert">
+              Achievement notifications
+            </label>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="reminderTime" class="form-label">Reminder Time</label>
+          <input type="time" class="form-control" id="reminderTime" value="19:00">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Learning Style</label>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="learningStyle" id="visual" checked>
+            <label class="form-check-label" for="visual">
+              Visual (images and examples)
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="learningStyle" id="audio">
+            <label class="form-check-label" for="audio">
+              Audio (pronunciation focus)
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="learningStyle" id="mixed">
+            <label class="form-check-label" for="mixed">
+              Mixed (visual + audio)
+            </label>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">
+          <i class="bi bi-check-lg me-2"></i>
+          Update Preferences
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 学习统计 -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h6 class="card-title mb-3">
+        <i class="bi bi-graph-up"></i> Learning Statistics
+      </h6>
+
+      <div class="row g-3">
+        <div class="col-6">
+          <div class="stat-card text-center p-3 bg-light rounded">
+            <h4 class="text-primary mb-1">7</h4>
+            <small class="text-muted">Days Active</small>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="stat-card text-center p-3 bg-light rounded">
+            <h4 class="text-success mb-1">328</h4>
+            <small class="text-muted">Words Learned</small>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="stat-card text-center p-3 bg-light rounded">
+            <h4 class="text-warning mb-1">15</h4>
+            <small class="text-muted">Day Streak</small>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="stat-card text-center p-3 bg-light rounded">
+            <h4 class="text-info mb-1">89%</h4>
+            <small class="text-muted">Accuracy</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 账户操作 -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h6 class="card-title mb-3 text-danger">
+        <i class="bi bi-exclamation-triangle"></i> Account Actions
+      </h6>
+
+      <div class="d-grid gap-2">
+        <button class="btn btn-outline-warning" onclick="window.location.href='change-password.html'">
+          <i class="bi bi-shield-lock me-2"></i>
+          Change Password
+        </button>
+
+        <button class="btn btn-outline-info" onclick="exportData()">
+          <i class="bi bi-download me-2"></i>
+          Export My Data
+        </button>
+
+        <button class="btn btn-outline-danger" onclick="confirmDelete()">
+          <i class="bi bi-trash me-2"></i>
+          Delete Account
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 底部导航栏 -->
+<nav class="bottom-nav fixed-bottom bg-white border-top">
+  <div class="container">
+    <div class="row text-center py-2">
+      <div class="col-4">
+        <a href="index.html" class="nav-item" aria-label="Home page">
+          <i class="bi bi-house-door"></i>
+          <span>Home</span>
+        </a>
+      </div>
+      <div class="col-4">
+        <a href="learn.html" class="nav-item" aria-label="Learn page">
+          <i class="bi bi-book"></i>
+          <span>Learn</span>
+        </a>
+      </div>
+      <div class="col-4">
+        <a href="progress.html" class="nav-item" aria-label="Progress page">
+          <i class="bi bi-bar-chart"></i>
+          <span>Progress</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<script>
+  // 更新目标值显示
+  document.getElementById('dailyGoal').addEventListener('input', function() {
+    document.getElementById('goalValue').textContent = this.value;
+  });
+
+  // 保存个人信息
+  document.getElementById('profileForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    showSuccessMessage(this, 'Profile updated successfully!');
+  });
+
+  // 保存偏好设置
+  document.getElementById('preferencesForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    showSuccessMessage(this, 'Preferences updated successfully!');
+  });
+
+  // 显示成功消息
+  function showSuccessMessage(form, message) {
+    const alert = document.createElement('div');
+    alert.className = 'alert alert-success border-0 mt-3';
+    alert.style.borderRadius = '12px';
+    alert.innerHTML = `<i class="bi bi-check-circle me-2"></i>${message}`;
+
+    form.appendChild(alert);
+
+    setTimeout(() => {
+      alert.remove();
+    }, 3000);
+  }
+
+  // 导出数据
+  function exportData() {
+    const data = {
+      profile: {
+        name: "Student User",
+        email: "student@example.com",
+        joinDate: "2024-10-01"
+      },
+      progress: {
+        totalWords: 328,
+        streak: 15,
+        accuracy: 89
+      },
+      words: [
+        { word: "apple", translation: "苹果", status: "mastered" },
+        { word: "book", translation: "书", status: "mastered" },
+        { word: "coffee", translation: "咖啡", status: "learning" }
+      ]
+    };
+
+    const dataStr = JSON.stringify(data, null, 2);
+    const dataBlob = new Blob([data
