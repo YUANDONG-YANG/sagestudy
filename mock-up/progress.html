@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Progress - SageStudy</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<!-- 顶部标题栏 -->
+<div class="top-header bg-gradient-primary">
+  <div class="container py-3">
+    <h5 class="text-white mb-0">
+      <i class="bi bi-bar-chart-fill"></i> My Progress
+    </h5>
+  </div>
+</div>
+
+<!-- 主要内容 -->
+<div class="container mt-4 pb-5">
+  <!-- 总体统计卡片 -->
+  <div class="card stats-card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row text-center">
+        <div class="col-6 border-end">
+          <h2 class="text-primary mb-1">328</h2>
+          <small class="text-muted">Total Words</small>
+        </div>
+        <div class="col-6">
+          <h2 class="text-success mb-1">89%</h2>
+          <small class="text-muted">Mastery Rate</small>
+        </div>
+      </div>
+      <hr class="my-3">
+      <div class="row text-center">
+        <div class="col-6 border-end">
+          <h3 class="text-warning mb-1">15</h3>
+          <small class="text-muted">Day Streak</small>
+        </div>
+        <div class="col-6">
+          <h3 class="text-info mb-1">2.5h</h3>
+          <small class="text-muted">Study Time</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 筛选器 - 用户输入 -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h6 class="card-title mb-3">
+        <i class="bi bi-funnel"></i> Filter Words
+      </h6>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label for="statusFilter" class="form-label">Status</label>
+          <select class="form-select" id="statusFilter" aria-label="Filter by status">
+            <option value="all" selected>All Words</option>
+            <option value="mastered">Mastered Only</option>
+            <option value="learning">Learning Only</option>
+            <option value="review">Need Review</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label for="dateFilter" class="form-label">Time Period</label>
+          <select class="form-select" id="dateFilter" aria-label="Filter by time period">
+            <option value="week" selected>This Week</option>
+            <option value="month">This Month</option>
+            <option value="all">All Time</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 学习日历 -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h6 class="card-title mb-3">
+        <i class="bi bi-calendar3"></i> Learning Calendar
+      </h6>
+
+      <!-- 周视图 -->
+      <div class="calendar-week">
+        <div class="row g-1">
+          <div class="col text-center">
+            <div class="calendar-day">
+              <small class="text-muted d-block mb-1">Mon</small>
+              <div class="day-circle completed" aria-label="Monday completed">
+                <i class="bi bi-check"></i>
+              </div>
+            </div>
+          </div>
+          <div class="col text-center">
+            <div class="calendar-day">
+              <small class="text-muted d-block mb-1">Tue</small>
+              <div class="day-circle completed" aria-label="Tuesday completed">
+                <i class="bi bi-check"></i>
+              </div>
+            </div>
+          </div>
+          <div class="col text-center">
+            <div class="calendar-day">
+              <small class="text-muted d-block mb-1">Wed</small>
+              <div class="day-circle completed" aria-label="Wednesday completed">
+                <i class="bi bi-check"></i>
+              </div>
+            </div>
+          </div>
+          <div class="col text-center">
+            <div class="calendar-day">
+              <small class="text-muted d-block mb-1">Thu</small>
+              <div class="day-circle active" aria-label="Thursday - today">
+                <span class="fw-bold">16</span>
+              </div>
+            </div>
+          </div>
+          <div class="col text-center">
+            <div class="calendar-day">
+              <small class="text-muted d-block mb-1">Fri</small>
+              <div class="day-circle" aria-label="Friday 17">
+                <span>17</span>
+              </div>
+            </div>
+          </div>
+          <div class="col text-center">
+            <div class="calendar-day">
+              <small class="text-muted d-block mb-1">Sat</small>
+              <div class="day-circle" aria-label="Saturday 18">
+                <span>18</span>
+              </div>
+            </div>
+          </div>
+          <div class="col text-center">
+            <div class="calendar-day">
+              <small class="text-muted d-block mb-1">Sun</small>
+              <div class="day-circle" aria-label="Sunday 19">
+                <span>19</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 词汇掌握分类 -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h6 class="card-title mb-3">
+        <i class="bi bi-pie-chart"></i> Vocabulary Status
+      </h6>
+
+      <div class="vocab-category mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div>
+            <span class="badge bg-success me-2">●</span>
+            <span>Mastered</span>
+          </div>
+          <span class="fw-bold">185 words</span>
+        </div>
+        <div class="progress" style="height: 8px;">
+          <div class="progress-bar bg-success" style="width: 56%" role="progressbar" aria-valuenow="56" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
+
+      <div class="vocab-category mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div>
+            <span class="badge bg-primary me-2">●</span>
+            <span>Learning</span>
+          </div>
+          <span class="fw-bold">98 words</span>
+        </div>
+        <div class="progress" style="height: 8px;">
+          <div class="progress-bar bg-primary" style="width: 30%" role="progressbar" aria-valuenow="30" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
+
+      <div class="vocab-category">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div>
+            <span class="badge bg-warning me-2">●</span>
+            <span>Need Review</span>
+          </div>
+          <span class="fw-bold">45 words</span>
+        </div>
+        <div class="progress" style="height: 8px;">
+          <div class="progress-bar bg-warning" style="width: 14%" role="progressbar" aria-valuenow="14" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 搜索已学单词 - 用户输入 -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h6 class="card-title mb-3">
+        <i class="bi bi-search"></i> Search Learned Words
+      </h6>
+      <div class="input-group">
+        <input type="text"
+               class="form-control"
+               placeholder="Search in your vocabulary..."
+               aria-label="Search learned words">
+        <button class="btn btn-outline-primary" type="button">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 最近学习的单词 -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h6 class="card-title mb-3">
+        <i class="bi bi-clock-history"></i> Recently Learned
+      </h6>
+
+      <div class="list-group list-group-flush">
+        <div class="list-group-item px-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="mb-1">Apple</h6>
+              <small class="text-muted">苹果</small>
+            </div>
+            <span class="badge bg-success">Mastered</span>
+          </div>
+        </div>
+        <div class="list-group-item px-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="mb-1">Book</h6>
+              <small class="text-muted">书</small>
+            </div>
+            <span class="badge bg-success">Mastered</span>
+          </div>
+        </div>
+        <div class="list-group-item px-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="mb-1">Coffee</h6>
+              <small class="text-muted">咖啡</small>
+            </div>
+            <span class="badge bg-primary">Learning</span>
+          </div>
+        </div>
+        <div class="list-group-item px-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="mb-1">Dictionary</h6>
+              <small class="text-muted">字典</small>
+            </div>
+            <span class="badge bg-primary">Learning</span>
+          </div>
+        </div>
+        <div class="list-group-item px-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h6 class="mb-1">Education</h6>
+              <small class="text-muted">教育</small>
+            </div>
+            <span class="badge bg-warning">Review</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 成就徽章 -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h6 class="card-title mb-3">
+        <i class="bi bi-trophy"></i> Achievements
+      </h6>
+
+      <div class="row g-3">
+        <div class="col-4 text-center">
+          <div class="achievement-badge earned">
+            <i class="bi bi-fire"></i>
+          </div>
+          <small class="d-block mt-2">7 Day Streak</small>
+        </div>
+        <div class="col-4 text-center">
+          <div class="achievement-badge earned">
+            <i class="bi bi-star-fill"></i>
+          </div>
+          <small class="d-block mt-2">100 Words</small>
+        </div>
+        <div class="col-4 text-center">
+          <div class="achievement-badge locked">
+            <i class="bi bi-lock"></i>
+          </div>
+          <small class="d-block mt-2">30 Day Streak</small>
+        </div>
+        <div class="col-4 text-center">
+          <div class="achievement-badge earned">
+            <i class="bi bi-lightning-fill"></i>
+          </div>
+          <small class="d-block mt-2">Perfect Week</small>
+        </div>
+        <div class="col-4 text-center">
+          <div class="achievement-badge earned">
+            <i class="bi bi-award-fill"></i>
+          </div>
+          <small class="d-block mt-2">Quick Learner</small>
+        </div>
+        <div class="col-4 text-center">
+          <div class="achievement-badge locked">
+            <i class="bi bi-gem"></i>
+          </div>
+          <small class="d-block mt-2">500 Words</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 学习建议 -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h6 class="card-title mb-3">
+        <i class="bi bi-lightbulb"></i> Study Recommendations
+      </h6>
+      <div class="alert alert-info mb-0">
+        <p class="mb-2"><strong>💡 Tip for Today:</strong></p>
+        <p class="mb-0">You have 45 words that need review. Spending 15 minutes reviewing them will help improve your retention rate!</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 底部导航栏 -->
+<nav class="bottom-nav fixed-bottom bg-white border-top">
+  <div class="container">
+    <div class="row text-center py-2">
+      <div class="col-4">
+        <a href="index.html" class="nav-item" aria-label="Home page">
+          <i class="bi bi-house-door"></i>
+          <span>Home</span>
+        </a>
+      </div>
+      <div class="col-4">
+        <a href="learn.html" class="nav-item" aria-label="Learn page">
+          <i class="bi bi-book"></i>
+          <span>Learn</span>
+        </a>
+      </div>
+      <div class="col-4">
+        <a href="progress.html" class="nav-item active" aria-label="Progress page">
+          <i class="bi bi-bar-chart-fill"></i>
+          <span>Progress</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+</body>
+</html>

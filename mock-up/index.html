@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SageStudy - Vocabulary Learning</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<!-- 顶部用户信息栏 -->
+<div class="top-header bg-gradient-primary">
+    <div class="container py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="user-info text-white">
+                <h5 class="mb-0">👋 Hello, Student!</h5>
+                <small class="opacity-75">Day 7 of learning</small>
+            </div>
+            <div class="streak-badge">
+                <div class="badge-circle bg-warning">
+                    <i class="bi bi-fire"></i>
+                    <span class="fw-bold">7</span>
+                </div>
+                <small class="text-white d-block mt-1">Day Streak</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 主要内容区域 -->
+<div class="container mt-4">
+    <!-- 搜索单词功能 - 用户输入 -->
+    <div class="card search-card shadow-sm mb-4">
+        <div class="card-body">
+            <h6 class="card-title text-muted mb-3">
+                <i class="bi bi-search"></i> Search Vocabulary
+            </h6>
+            <div class="input-group">
+                <input type="text"
+                       class="form-control"
+                       placeholder="Type a word to search..."
+                       aria-label="Search for a word">
+                <button class="btn btn-primary" type="button">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 今日目标卡片 -->
+    <div class="card goal-card shadow-sm mb-4">
+        <div class="card-body">
+            <h6 class="card-title text-muted mb-3">
+                <i class="bi bi-calendar-check"></i> Today's Goal
+            </h6>
+            <div class="progress-info mb-3">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="fw-bold">Learn 20 new words</span>
+                    <span class="text-primary fw-bold">8/20</span>
+                </div>
+                <div class="progress" style="height: 12px;">
+                    <div class="progress-bar bg-primary" role="progressbar"
+                         style="width: 40%" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100">
+                    </div>
+                </div>
+            </div>
+            <small class="text-muted">
+                <i class="bi bi-clock"></i> 12 words left to complete today's goal
+            </small>
+        </div>
+    </div>
+
+    <!-- 设置每日学习目标 - 用户输入 -->
+    <div class="card mb-4 shadow-sm">
+        <div class="card-body">
+            <h6 class="card-title text-muted mb-3">
+                <i class="bi bi-gear"></i> Adjust Daily Goal
+            </h6>
+            <label for="goalRange" class="form-label">
+                Words per day: <span class="text-primary fw-bold" id="goalValue">20</span>
+            </label>
+            <input type="range"
+                   class="form-range"
+                   min="10"
+                   max="50"
+                   step="5"
+                   value="20"
+                   id="goalRange"
+                   oninput="document.getElementById('goalValue').textContent = this.value"
+                   aria-label="Daily word goal slider">
+            <div class="d-flex justify-content-between">
+                <small class="text-muted">10 words</small>
+                <small class="text-muted">50 words</small>
+            </div>
+            <div class="alert alert-info mt-3 mb-0">
+                <small>
+                    <i class="bi bi-info-circle"></i>
+                    <strong>Note:</strong> In Phase 4, this slider will dynamically update your daily goal in real-time with full JavaScript functionality.
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- 学习模式选择 -->
+    <h6 class="text-muted mb-3">Choose Learning Mode</h6>
+
+    <!-- 学习新单词 -->
+    <a href="learn.html" class="text-decoration-none">
+        <div class="card mode-card mb-3 shadow-sm hover-lift">
+            <div class="card-body d-flex align-items-center">
+                <div class="mode-icon bg-primary-soft me-3">
+                    <i class="bi bi-book text-primary"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="mb-1">Learn New Words</h6>
+                    <small class="text-muted">12 words waiting</small>
+                </div>
+                <i class="bi bi-chevron-right text-muted"></i>
+            </div>
+        </div>
+    </a>
+
+    <!-- 复习单词 -->
+    <a href="learn.html" class="text-decoration-none">
+        <div class="card mode-card mb-3 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+                <div class="mode-icon bg-success-soft me-3">
+                    <i class="bi bi-arrow-clockwise text-success"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="mb-1">Review Words</h6>
+                    <small class="text-muted">45 words to review</small>
+                </div>
+                <i class="bi bi-chevron-right text-muted"></i>
+            </div>
+        </div>
+    </a>
+
+    <!-- 单词测试 -->
+    <a href="learn.html" class="text-decoration-none">
+        <div class="card mode-card mb-3 shadow-sm">
+            <div class="card-body d-flex align-items-center">
+                <div class="mode-icon bg-warning-soft me-3">
+                    <i class="bi bi-lightning text-warning"></i>
+                </div>
+                <div class="flex-grow-1">
+                    <h6 class="mb-1">Quick Test</h6>
+                    <small class="text-muted">Challenge yourself</small>
+                </div>
+                <i class="bi bi-chevron-right text-muted"></i>
+            </div>
+        </div>
+    </a>
+
+    <!-- 学习统计预览 -->
+    <div class="card stats-preview mt-4 mb-4">
+        <div class="card-body">
+            <h6 class="card-title mb-3">This Week</h6>
+            <div class="row text-center">
+                <div class="col-4">
+                    <div class="stat-item">
+                        <h4 class="text-primary mb-0">85</h4>
+                        <small class="text-muted">Words Learned</small>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="stat-item">
+                        <h4 class="text-success mb-0">92%</h4>
+                        <small class="text-muted">Accuracy</small>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="stat-item">
+                        <h4 class="text-warning mb-0">45</h4>
+                        <small class="text-muted">Minutes</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 底部导航栏 -->
+<nav class="bottom-nav fixed-bottom bg-white border-top">
+    <div class="container">
+        <div class="row text-center py-2">
+            <div class="col-4">
+                <a href="index.html" class="nav-item active" aria-label="Home page">
+                    <i class="bi bi-house-door-fill"></i>
+                    <span>Home</span>
+                </a>
+            </div>
+            <div class="col-4">
+                <a href="learn.html" class="nav-item" aria-label="Learn page">
+                    <i class="bi bi-book"></i>
+                    <span>Learn</span>
+                </a>
+            </div>
+            <div class="col-4">
+                <a href="progress.html" class="nav-item" aria-label="Progress page">
+                    <i class="bi bi-bar-chart"></i>
+                    <span>Progress</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+</body>
+</html>

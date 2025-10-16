@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Learn Words - SageStudy</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="learning-page">
+<!-- 顶部进度栏 -->
+<div class="learning-header">
+  <div class="container-fluid py-2">
+    <div class="d-flex align-items-center justify-content-between">
+      <a href="index.html" class="btn btn-sm btn-light" aria-label="Exit learning">
+        <i class="bi bi-x-lg"></i>
+      </a>
+      <div class="flex-grow-1 mx-3">
+        <div class="progress" style="height: 8px;">
+          <div class="progress-bar bg-success" style="width: 25%" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+      </div>
+      <span class="badge bg-light text-dark">3/12</span>
+    </div>
+  </div>
+</div>
+
+<!-- 单词卡片主体 -->
+<div class="container word-card-container">
+  <!-- 难度选择 - 用户输入 -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h6 class="card-title mb-3">
+        <i class="bi bi-sliders"></i> Difficulty Level
+      </h6>
+      <div class="btn-group w-100" role="group" aria-label="Difficulty level selection">
+        <input type="radio" class="btn-check" name="difficulty" id="easy" checked>
+        <label class="btn btn-outline-success" for="easy">
+          <i class="bi bi-emoji-smile"></i> Easy
+        </label>
+
+        <input type="radio" class="btn-check" name="difficulty" id="medium">
+        <label class="btn btn-outline-warning" for="medium">
+          <i class="bi bi-emoji-neutral"></i> Medium
+        </label>
+
+        <input type="radio" class="btn-check" name="difficulty" id="hard">
+        <label class="btn btn-outline-danger" for="hard">
+          <i class="bi bi-emoji-frown"></i> Hard
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- 单词卡片 -->
+  <div class="word-card text-center">
+    <!-- 单词图片区域 - 使用在线图片 -->
+    <div class="word-image-container mb-4">
+      <img src="https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=500&h=300&fit=crop&auto=format"
+           alt="Red Apple"
+           class="img-fluid shadow-sm"
+           style="width: 100%; height: 250px; object-fit: cover; border-radius: 20px;">
+    </div>
+
+    <!-- 单词信息 -->
+    <div class="word-info">
+      <h1 class="word-text mb-2">Apple</h1>
+      <div class="word-pronunciation mb-3">
+        <span class="text-muted">/ˈæpl/</span>
+        <button class="btn btn-sm btn-outline-primary ms-2" aria-label="Play pronunciation">
+          <i class="bi bi-volume-up"></i>
+        </button>
+      </div>
+
+      <!-- 词性和释义 -->
+      <div class="word-definition text-start mb-4">
+        <span class="badge bg-info mb-2">n. 名词</span>
+        <p class="lead">苹果；苹果树</p>
+      </div>
+
+      <!-- 例句 -->
+      <div class="word-example text-start">
+        <h6 class="text-muted mb-2">
+          <i class="bi bi-chat-quote"></i> Example
+        </h6>
+        <div class="alert alert-light">
+          <p class="mb-1">I eat an <strong>apple</strong> every day.</p>
+          <small class="text-muted">我每天吃一个苹果。</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 笔记输入 - 用户输入 -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <h6 class="card-title mb-3">
+        <i class="bi bi-journal-text"></i> Add Your Notes
+      </h6>
+      <textarea
+              class="form-control"
+              rows="3"
+              placeholder="Write your own notes, mnemonics, or example sentences..."
+              aria-label="Personal notes for this word"></textarea>
+      <div class="form-text mt-2">
+        💡 Tip: Adding personal notes helps you remember better!
+      </div>
+    </div>
+  </div>
+
+  <!-- 选项区域 (百词斩风格的图片选择) -->
+  <div class="options-container mt-4">
+    <h6 class="text-center text-muted mb-3">
+      <i class="bi bi-check-circle"></i> Select the correct image for "Apple"
+    </h6>
+
+    <div class="row g-3">
+      <!-- 选项 A: 香蕉 -->
+      <div class="col-6">
+        <div class="option-card" role="button" tabindex="0" aria-label="Option A: Banana">
+          <img src="https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=200&h=150&fit=crop&auto=format"
+               alt="Banana"
+               style="width: 100%; height: 120px; object-fit: cover; border-radius: 10px;">
+          <p class="text-center mt-2 mb-0"><small>Banana</small></p>
+        </div>
+      </div>
+
+      <!-- 选项 B: 橙子 -->
+      <div class="col-6">
+        <div class="option-card" role="button" tabindex="0" aria-label="Option B: Orange">
+          <img src="https://images.unsplash.com/photo-1582979512210-99b6a53386f9?w=200&h=150&fit=crop&auto=format"
+               alt="Orange"
+               style="width: 100%; height: 120px; object-fit: cover; border-radius: 10px;">
+          <p class="text-center mt-2 mb-0"><small>Orange</small></p>
+        </div>
+      </div>
+
+      <!-- 选项 C: 苹果 (正确答案) -->
+      <div class="col-6">
+        <div class="option-card selected" role="button" tabindex="0" aria-label="Option C: Apple - Selected">
+          <img src="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=200&h=150&fit=crop&auto=format"
+               alt="Apple"
+               style="width: 100%; height: 120px; object-fit: cover; border-radius: 10px;">
+          <p class="text-center mt-2 mb-0"><small>Apple ✓</small></p>
+          <div class="selected-indicator">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- 选项 D: 葡萄 -->
+      <div class="col-6">
+        <div class="option-card" role="button" tabindex="0" aria-label="Option D: Grapes">
+          <img src="https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=200&h=150&fit=crop&auto=format"
+               alt="Grapes"
+               style="width: 100%; height: 120px; object-fit: cover; border-radius: 10px;">
+          <p class="text-center mt-2 mb-0"><small>Grapes</small></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 信心等级 - 用户输入 -->
+  <div class="card mt-4 shadow-sm">
+    <div class="card-body">
+      <h6 class="card-title mb-3">
+        <i class="bi bi-emoji-smile"></i> How confident are you with this word?
+      </h6>
+      <div class="text-center mb-2">
+        <span class="badge bg-primary" id="confidenceLabel">Level 3 - Moderate</span>
+      </div>
+      <div class="d-flex justify-content-between mb-2">
+        <small class="text-muted">Not confident</small>
+        <small class="text-muted">Very confident</small>
+      </div>
+      <input
+              type="range"
+              class="form-range"
+              min="1"
+              max="5"
+              step="1"
+              value="3"
+              id="confidenceRange"
+              oninput="updateConfidence(this.value)"
+              aria-label="Confidence level slider">
+      <div class="d-flex justify-content-between mt-1">
+        <small>😟</small>
+        <small>😐</small>
+        <small>🙂</small>
+        <small>😊</small>
+        <small>😄</small>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function updateConfidence(value) {
+      const labels = {
+        '1': 'Level 1 - Need Practice',
+        '2': 'Level 2 - Somewhat Confident',
+        '3': 'Level 3 - Moderate',
+        '4': 'Level 4 - Very Confident',
+        '5': 'Level 5 - Mastered'
+      };
+      document.getElementById('confidenceLabel').textContent = labels[value];
+    }
+  </script>
+
+  <!-- 操作按钮 -->
+  <div class="action-buttons mt-4 mb-5">
+    <div class="row g-2">
+      <div class="col-4">
+        <button class="btn btn-outline-secondary w-100 btn-lg" aria-label="Report issue">
+          <i class="bi bi-flag"></i>
+        </button>
+      </div>
+      <div class="col-4">
+        <button class="btn btn-outline-primary w-100 btn-lg" aria-label="Save word">
+          <i class="bi bi-bookmark"></i>
+        </button>
+      </div>
+      <div class="col-4">
+        <button class="btn btn-primary w-100 btn-lg" aria-label="Next word">
+          <i class="bi bi-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- 跳过按钮 -->
+    <div class="text-center mt-3">
+      <button class="btn btn-link text-muted" aria-label="Skip this word">
+        Skip this word →
+      </button>
+    </div>
+  </div>
+
+  <!-- 帮助提示 -->
+  <div class="card mb-4 bg-light">
+    <div class="card-body">
+      <h6 class="mb-2">
+        <i class="bi bi-lightbulb text-warning"></i> Learning Tip
+      </h6>
+      <small class="text-muted">
+        Try to use this word in your own sentence. Studies show that creating personal examples improves memory retention by 40%!
+      </small>
+    </div>
+  </div>
+</div>
+
+<!-- 底部导航栏 -->
+<nav class="bottom-nav fixed-bottom bg-white border-top">
+  <div class="container">
+    <div class="row text-center py-2">
+      <div class="col-4">
+        <a href="index.html" class="nav-item" aria-label="Home page">
+          <i class="bi bi-house-door"></i>
+          <span>Home</span>
+        </a>
+      </div>
+      <div class="col-4">
+        <a href="learn.html" class="nav-item active" aria-label="Learn page">
+          <i class="bi bi-book-fill"></i>
+          <span>Learn</span>
+        </a>
+      </div>
+      <div class="col-4">
+        <a href="progress.html" class="nav-item" aria-label="Progress page">
+          <i class="bi bi-bar-chart"></i>
+          <span>Progress</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+</body>
+</html>
