@@ -1,0 +1,59 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Finish homework",
+      "description": "Complete Finish homework CPRG303A"
+    },
+    {
+      "id": 2,
+      "title": "Buy groceries",
+      "description": "Buy groceries for yourself"
+    },
+    {
+      "id": 3,
+      "title": "Walk the dog",
+      "description": "Walk the dog that you like"
+    },
+    {
+      "id": 4,
+      "title": "Read a book",
+      "description": "Read a book every month"
+    },
+    {
+      "id": 5,
+      "title": "Do laundry",
+      "description": "Do laundry for your family"
+    },
+    {
+      "id": 6,
+      "title": "Exercise",
+      "description": "Learn Mobile App Design Principles and Do more Exercise"
+    },
+    {
+      "id": 7,
+      "title": "Practice coding",
+      "description": "Learn Advanced Git Commands and Practice coding"
+    },
+    {
+      "id": 8,
+      "title": "Write a blog post",
+      "description": "Write a blog post regarding your life"
+    },
+    {
+      "id": 9,
+      "title": "Learn the React Component Lifecycle",
+      "description": "Understand useEffect, useState, and React Native Component Patterns"
+    },
+    {
+      "id": 10,
+      "title": "Call a friend",
+      "description": "Call a friend when you feel not good"
+    },
+    {
+      "id": 11,
+      "title": "Water the plants",
+      "description": "Water the plants as you can"
+    }
+  ]
+}
