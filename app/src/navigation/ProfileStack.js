@@ -2,10 +2,10 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import ProfileScreen from "../screens/ProfileScreen";
-import PrivacyPolicyScreen from "../screens/PrivacyPolicyScreen";
-import HelpSupportScreen from "../screens/HelpSupportScreen";
-import ChangePasswordScreen from "../screens/ChangePasswordScreen";
+import ProfileScreen from "../screen/ProfileScreen";
+import PrivacyPolicyScreen from "../screen/PrivacyPolicyScreen";
+import HelpSupportScreen from "../screen/HelpSupportScreen";
+import ChangePasswordScreen from "../screen/ChangePasswordScreen";
 
 const Stack = createNativeStackNavigator();
 

@@ -3,9 +3,9 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
-import HomeScreen from "../screens/HomeScreen";
-import LearnScreen from "../screens/LearnScreen";
-import ProgressScreen from "../screens/ProgressScreen";
+import HomeScreen from "../screen/HomeScreen";
+import LearnScreen from "../screen/LearnScreen";
+import ProgressScreen from "../screen/ProgressScreen";
 import ProfileStack from "./ProfileStack";
 
 const Tab = createBottomTabNavigator();

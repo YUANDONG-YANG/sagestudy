@@ -1,12 +1,12 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import TaskListScreen from "../screens/planner/TaskListScreen";
-import AddTaskScreen from "../screens/planner/AddTaskScreen";
-import TaskDetailScreen from "../screens/planner/TaskDetailScreen";
-import AssessmentListScreen from "../screens/planner/AssessmentListScreen";
-import CalendarScreen from "../screens/planner/CalendarScreen";
-import ReminderSettingsScreen from "../screens/planner/ReminderSettingsScreen";
+import TaskListScreen from "../screen/planner/TaskListScreen";
+import AddTaskScreen from "../screen/planner/AddTaskScreen";
+import TaskDetailScreen from "../screen/planner/TaskDetailScreen";
+import AssessmentListScreen from "../screen/planner/AssessmentListScreen";
+import CalendarScreen from "../screen/planner/CalendarScreen";
+import ReminderSettingsScreen from "../screen/planner/ReminderSettingsScreen";
 
 const Stack = createNativeStackNavigator();
 
