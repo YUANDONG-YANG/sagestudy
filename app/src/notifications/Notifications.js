@@ -1,83 +1,89 @@
-import PushNotification from "react-native-push-notification";
-import { PermissionsAndroid, Platform } from "react-native";
+import { Notifications } from "react-native-notifications";
+import { Platform, PermissionsAndroid } from "react-native";
 
-/* -----------------------------
-   Android 13+ 通知权限（必须）
--------------------------------- */
-if (Platform.OS === "android" && Platform.Version >= 33) {
-    PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-    ).catch(() => {});
-}
+class NotificationService {
 
-/* -----------------------------
-    创建通知频道
--------------------------------- */
-PushNotification.createChannel(
-    {
-        channelId: "study_planner",
-        channelName: "Study Planner Notifications",
-        importance: 4,
-        vibrate: true,
-        playSound: true,
-        soundName: "default",
-    },
-    (created) =>
-        console.log("[Notification Channel]:", created ? "created" : "exists")
-);
+    /* -----------------------------
+     * ANDROID 13+ 权限请求
+     * ----------------------------- */
+    async requestPermissions() {
+        if (Platform.OS !== "android") return;
 
-/* -----------------------------
-    创建计划提醒通知
--------------------------------- */
-export function scheduleTaskNotification(task) {
-    try {
-        if (!task.reminderTime) return;
+        if (Platform.Version >= 33) {
+            const result = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+            );
 
-        const reminderDate = new Date(task.reminderTime);
-        const now = new Date();
-        if (reminderDate <= now) return;
+            console.log("🔔 Android Notification Permission:", result);
+        }
+    }
 
-        PushNotification.localNotificationSchedule({
-            channelId: "study_planner",
-            id: String(task.id),
-            title:
-                task.type === "assessment"
-                    ? "Assessment Reminder"
-                    : "Task Reminder",
-            message:
-                task.type === "assessment"
-                    ? `Your assessment "${task.title}" is coming soon.`
-                    : `Your task "${task.title}" is due at ${new Date(
-                        task.dueDate
-                    ).toLocaleTimeString()}.`,
-            date: reminderDate,
-            allowWhileIdle: true,
-            playSound: true,
-            soundName: "default",
+    /* -----------------------------
+     * 初始化监听事件
+     * ----------------------------- */
+    registerListeners() {
+        // 注册成功（接收 token）
+        Notifications.events().registerRemoteNotificationsRegistered((event) => {
+            console.log("📲 Device Push Token:", event.deviceToken);
         });
-    } catch (e) {
-        console.log("scheduleTaskNotification error:", e);
+
+        // 注册失败
+        Notifications.events().registerRemoteNotificationsRegistrationFailed(
+            (event) => {
+                console.log("❌ Failed to register:", event);
+            }
+        );
+
+        // 点击通知
+        Notifications.events().registerNotificationOpened(
+            (notification, completion) => {
+                console.log("🔔 Notification opened:", notification);
+                completion();
+            }
+        );
+
+        // 收到通知
+        Notifications.events().registerNotificationReceivedForeground(
+            (notification, completion) => {
+                console.log("📨 Notification received in foreground:", notification);
+                completion({ alert: true, sound: true, badge: false });
+            }
+        );
+    }
+
+    /* -----------------------------
+     * 发送即时通知
+     * ----------------------------- */
+    sendImmediateNotification(title, body, payload = {}) {
+        Notifications.postLocalNotification({
+            title,
+            body,
+            sound: "default",
+            silent: false,
+            extra: payload,
+        });
+    }
+
+    /* -----------------------------
+     * 发送定时通知
+     * ----------------------------- */
+    scheduleNotification(title, body, date, payload = {}) {
+        Notifications.postLocalNotification({
+            title,
+            body,
+            fireDate: date.getTime(), // 毫秒时间戳
+            sound: "default",
+            silent: false,
+            extra: payload,
+        });
+    }
+
+    /* -----------------------------
+     * 取消所有通知
+     * ----------------------------- */
+    cancelAll() {
+        Notifications.cancelAllLocalNotifications();
     }
 }
 
-/* -----------------------------
-    取消单个通知
--------------------------------- */
-export function cancelNotificationById(id) {
-    PushNotification.cancelLocalNotification({ id: String(id) });
-}
-
-/* -----------------------------
-    更新通知（先删除再添加）
--------------------------------- */
-export function updateTaskNotification(task) {
-    cancelNotificationById(task.id);
-    scheduleTaskNotification(task);
-}
-
-/* -----------------------------
-    清空所有任务通知
--------------------------------- */
-export function cancelAllTaskNotifications() {
-    PushNotification.cancelAllLocalNotifications();
-}
+export const NotificationServiceInstance = new NotificationService();

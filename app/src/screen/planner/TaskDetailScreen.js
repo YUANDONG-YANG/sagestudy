@@ -21,10 +21,16 @@ import {
     deleteTask,
 } from "../../storage/TasksStorage";
 
-import {
-    scheduleTaskNotification,
-    cancelNotificationById,
-} from "../../notifications/Notifications";
+import { NotificationServiceInstance } from "../../notifications/Notifications";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+/* -----------------------------
+ * 获取默认提醒提前时间
+ * ----------------------------- */
+async function getReminderOffset() {
+    const value = await AsyncStorage.getItem("REMINDER_OFFSET");
+    return value ? Number(value) : 0;
+}
 
 export default function TaskDetailScreen({ route, navigation }) {
     const { taskId } = route.params;
@@ -32,7 +38,6 @@ export default function TaskDetailScreen({ route, navigation }) {
     const [task, setTask] = useState(null);
 
     const [showDuePicker, setShowDuePicker] = useState(false);
-    const [showReminderPicker, setShowReminderPicker] = useState(false);
 
     useEffect(() => {
         loadTask();
@@ -48,77 +53,124 @@ export default function TaskDetailScreen({ route, navigation }) {
         setTask({
             ...t,
             dueDate: new Date(t.dueDate),
-            reminderTime: new Date(t.reminderTime),
         });
     };
 
+    if (!task) return null;
+
+    /* -----------------------------
+     * 保存修改（含通知更新）
+     * ----------------------------- */
     const saveChanges = async () => {
         const updated = {
             ...task,
             dueDate: task.dueDate.toISOString(),
-            reminderTime: task.reminderTime.toISOString(),
         };
 
         await updateTask(updated);
-        scheduleTaskNotification(updated);
+
+        // 清理旧通知（目前 cancelAll – 可未来改成按 ID 清理）
+        NotificationServiceInstance.cancelAll();
+
+        if (!updated.completed) {
+            const reminderOffset = await getReminderOffset();
+
+            const notifyDate = new Date(
+                new Date(updated.dueDate).getTime() - reminderOffset * 60 * 1000
+            );
+
+            if (notifyDate > new Date()) {
+                NotificationServiceInstance.scheduleNotification(
+                    "Updated Task",
+                    updated.title,
+                    notifyDate,
+                    { taskId: updated.id }
+                );
+            }
+        }
 
         alert("Task updated");
         navigation.goBack();
     };
 
+    /* -----------------------------
+     * 切换完成状态（并更新通知）
+     * ----------------------------- */
     const toggleComplete = async () => {
         const updated = {
             ...task,
             completed: !task.completed,
         };
+
         await updateTask(updated);
-        scheduleTaskNotification(updated);
+
+        // 完成任务 → 取消通知
+        NotificationServiceInstance.cancelAll();
+
+        // 恢复任务 → 重新调度通知
+        if (!updated.completed) {
+            const reminderOffset = await getReminderOffset();
+            const notifyDate = new Date(
+                new Date(updated.dueDate).getTime() - reminderOffset * 60 * 1000
+            );
+
+            if (notifyDate > new Date()) {
+                NotificationServiceInstance.scheduleNotification(
+                    "Upcoming Task",
+                    updated.title,
+                    notifyDate,
+                    { taskId: updated.id }
+                );
+            }
+        }
+
         setTask(updated);
     };
 
+    /* -----------------------------
+     * 删除任务（并取消通知）
+     * ----------------------------- */
     const confirmDelete = () => {
         Alert.alert(
             "Delete Task",
             "Are you sure you want to delete this task?",
             [
                 { text: "Cancel", style: "cancel" },
-                {
-                    text: "Delete",
-                    style: "destructive",
-                    onPress: removeTask,
-                },
+                { text: "Delete", style: "destructive", onPress: removeTask },
             ]
         );
     };
 
     const removeTask = async () => {
         await deleteTask(task.id);
-        cancelNotificationById(task.id);
+
+        NotificationServiceInstance.cancelAll();
+
         navigation.goBack();
     };
 
-    if (!task) return null;
-
     return (
         <View style={styles.container}>
-            <PurpleHeader title="Task Details" onBack={() => navigation.goBack()} />
+            <PurpleHeader title="Task Detail" onBack={() => navigation.goBack()} />
 
             <PurpleCard>
+                {/* Title */}
                 <PurpleInput
                     label="Title"
                     value={task.title}
                     onChangeText={(v) => setTask({ ...task, title: v })}
                 />
 
+                {/* Description */}
                 <PurpleInput
                     label="Description"
                     value={task.desc}
                     placeholder="Add notes..."
-                    multiline
                     onChangeText={(v) => setTask({ ...task, desc: v })}
+                    multiline
                 />
 
-                {/* Type Selector */}
+                {/* Type */}
                 <Text style={styles.label}>Type</Text>
                 <View style={styles.typeRow}>
                     <TouchableOpacity
@@ -143,7 +195,9 @@ export default function TaskDetailScreen({ route, navigation }) {
                             styles.typeBtn,
                             task.type === "assessment" && styles.typeActive,
                         ]}
-                        onPress={() => setTask({ ...task, type: "assessment" })}
+                        onPress={() =>
+                            setTask({ ...task, type: "assessment" })
+                        }
                     >
                         <Text
                             style={[
@@ -174,45 +228,19 @@ export default function TaskDetailScreen({ route, navigation }) {
                         display={Platform.OS === "ios" ? "spinner" : "default"}
                         onChange={(event, selected) => {
                             setShowDuePicker(false);
-                            if (selected) setTask({ ...task, dueDate: selected });
-                        }}
-                    />
-                )}
-
-                {/* Reminder */}
-                <Text style={styles.label}>Reminder Time</Text>
-                <TouchableOpacity
-                    style={styles.dateBtn}
-                    onPress={() => setShowReminderPicker(true)}
-                >
-                    <Text style={styles.dateText}>
-                        {task.reminderTime.toLocaleString()}
-                    </Text>
-                </TouchableOpacity>
-
-                {showReminderPicker && (
-                    <DateTimePicker
-                        value={task.reminderTime}
-                        mode="datetime"
-                        display={Platform.OS === "ios" ? "spinner" : "default"}
-                        onChange={(event, selected) => {
-                            setShowReminderPicker(false);
                             if (selected)
-                                setTask({ ...task, reminderTime: selected });
+                                setTask({ ...task, dueDate: selected });
                         }}
                     />
                 )}
 
-                {/* Completed Button */}
                 <PurpleButton
                     label={task.completed ? "Mark as Pending" : "Mark as Complete"}
                     onPress={toggleComplete}
                 />
 
-                {/* Save Changes */}
                 <PurpleButton label="Save Changes" onPress={saveChanges} />
 
-                {/* Delete */}
                 <TouchableOpacity style={styles.deleteBtn} onPress={confirmDelete}>
                     <Text style={styles.deleteText}>Delete Task</Text>
                 </TouchableOpacity>
@@ -221,11 +249,13 @@ export default function TaskDetailScreen({ route, navigation }) {
     );
 }
 
-/* ---------------- Styles ---------------- */
+/* ------------------ Styles ------------------ */
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: "#ffffff" },
-
+    container: {
+        flex: 1,
+        backgroundColor: "#fff",
+    },
     label: {
         fontWeight: "700",
         color: "#4A3A67",
@@ -233,7 +263,6 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
 
-    /* Type selection */
     typeRow: {
         flexDirection: "row",
         marginBottom: 10,
@@ -246,16 +275,18 @@ const styles = StyleSheet.create({
         marginRight: 8,
         alignItems: "center",
     },
-    typeActive: { backgroundColor: "#6C4AB6" },
-
+    typeActive: {
+        backgroundColor: "#6C4AB6",
+    },
     typeText: {
         fontSize: 15,
         fontWeight: "600",
         color: "#555",
     },
-    typeTextActive: { color: "white" },
+    typeTextActive: {
+        color: "white",
+    },
 
-    /* Date selector */
     dateBtn: {
         backgroundColor: "#F3EFFF",
         padding: 12,
@@ -267,7 +298,6 @@ const styles = StyleSheet.create({
         fontWeight: "500",
     },
 
-    /* Delete */
     deleteBtn: {
         marginTop: 16,
         paddingVertical: 12,

@@ -9,7 +9,16 @@ import PurpleInput from "../../components/PurpleInput";
 import PurpleButton from "../../components/PurpleButton";
 
 import { saveTask } from "../../storage/TasksStorage";
-import { scheduleTaskNotification } from "../../notifications/Notifications";
+import { NotificationServiceInstance } from "../../notifications/Notifications";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+/* -----------------------------
+ * 获取默认提醒提前时间
+ * ----------------------------- */
+async function getReminderOffset() {
+    const value = await AsyncStorage.getItem("REMINDER_OFFSET");
+    return value ? Number(value) : 0;
+}
 
 export default function AddTaskScreen({ navigation }) {
     const [title, setTitle] = useState("");
@@ -19,16 +28,17 @@ export default function AddTaskScreen({ navigation }) {
     const [dueDate, setDueDate] = useState(new Date());
     const [showDuePicker, setShowDuePicker] = useState(false);
 
-    const [reminderTime, setReminderTime] = useState(new Date());
-    const [showReminderPicker, setShowReminderPicker] = useState(false);
-
+    /* -----------------------------
+     * 保存任务
+     * ----------------------------- */
     const handleSave = async () => {
         if (!title.trim()) {
             alert("Please enter a task title.");
             return;
         }
 
-        const id = uuid.v4(); // FIX: Generate unique id
+        const reminderOffset = await getReminderOffset();
+        const id = uuid.v4();
 
         const newTask = {
             id,
@@ -36,12 +46,26 @@ export default function AddTaskScreen({ navigation }) {
             desc,
             type,
             dueDate: dueDate.toISOString(),
-            reminderTime: reminderTime.toISOString(),
-            completed: false,
+            completed: false
         };
 
         await saveTask(newTask);
-        scheduleTaskNotification(newTask);
+
+        /* -----------------------------
+         * 🔔 自动调度通知
+         * ----------------------------- */
+        const notifyDate = new Date(
+            new Date(newTask.dueDate).getTime() - reminderOffset * 60 * 1000
+        );
+
+        if (notifyDate > new Date()) {
+            NotificationServiceInstance.scheduleNotification(
+                "Upcoming Task",
+                newTask.title,
+                notifyDate,
+                { taskId: newTask.id }
+            );
+        }
 
         alert("Task saved!");
         navigation.goBack();
@@ -116,27 +140,6 @@ export default function AddTaskScreen({ navigation }) {
                         onChange={(event, selected) => {
                             setShowDuePicker(false);
                             if (selected) setDueDate(selected);
-                        }}
-                    />
-                )}
-
-                {/* Reminder Time */}
-                <Text style={styles.label}>Reminder Time</Text>
-                <TouchableOpacity
-                    style={styles.dateBtn}
-                    onPress={() => setShowReminderPicker(true)}
-                >
-                    <Text style={styles.dateText}>{reminderTime.toLocaleString()}</Text>
-                </TouchableOpacity>
-
-                {showReminderPicker && (
-                    <DateTimePicker
-                        value={reminderTime}
-                        mode="datetime"
-                        display={Platform.OS === "ios" ? "spinner" : "default"}
-                        onChange={(event, selected) => {
-                            setShowReminderPicker(false);
-                            if (selected) setReminderTime(selected);
                         }}
                     />
                 )}
