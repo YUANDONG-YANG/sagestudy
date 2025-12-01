@@ -1,4 +1,3 @@
-// app/src/navigation/ProfileStack.js
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
@@ -6,6 +5,7 @@ import ProfileScreen from "../screen/ProfileScreen";
 import PrivacyPolicyScreen from "../screen/PrivacyPolicyScreen";
 import HelpSupportScreen from "../screen/HelpSupportScreen";
 import ChangePasswordScreen from "../screen/ChangePasswordScreen";
+import ReminderSettingsScreen from "../screen/planner/ReminderSettingsScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -16,6 +16,7 @@ export default function ProfileStack() {
             <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
             <Stack.Screen name="HelpSupport" component={HelpSupportScreen} />
             <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+            <Stack.Screen name="ReminderSettings" component={ReminderSettingsScreen} />
         </Stack.Navigator>
     );
 }

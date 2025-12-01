@@ -19,7 +19,7 @@ export default function LoginScreen({ navigation }) {
             alert("Please enter your email and password.");
             return;
         }
-        navigation.navigate("Home");
+        navigation.navigate("MainTabs");
     };
 
     return (

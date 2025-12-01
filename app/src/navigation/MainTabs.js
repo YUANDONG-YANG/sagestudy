@@ -1,4 +1,3 @@
-// app/src/navigation/MainTabs.js
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -27,7 +26,7 @@ export default function MainTabs() {
                     borderTopColor: "#EDEAFF",
                 },
 
-                tabBarIcon: ({ color, size }) => {
+                tabBarIcon: ({ color }) => {
                     const icons = {
                         Home: "home",
                         Learn: "menu-book",

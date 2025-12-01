@@ -1,6 +1,6 @@
 // app/src/navigation/AppNavigator.js
 import React from "react";
-import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
+import {NavigationContainer, DefaultTheme} from "@react-navigation/native";
 import RootNavigator from "./RootNavigator";
 
 const MyTheme = {
@@ -18,8 +18,6 @@ const MyTheme = {
 
 export default function AppNavigator() {
     return (
-        <NavigationContainer theme={MyTheme}>
-            <RootNavigator />
-        </NavigationContainer>
+        <RootNavigator/>
     );
 }
