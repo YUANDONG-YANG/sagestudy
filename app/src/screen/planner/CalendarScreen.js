@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from "react-native";
 import { Calendar } from "react-native-calendars";
-import Icon from "react-native-vector-icons/MaterialIcons";
+import IconWithFallback from "../../components/IconWithFallback";
 
 import PurpleHeader from "../../components/PurpleHeader";
 import PurpleCard from "../../components/PurpleCard";
-
-import { getAllTasks } from "../../storage/TasksStorage";
+import { getTaskIconName, getTaskIconColor } from "../../utils/helpers";
+import { getAllTasks } from "../../data/planner/TasksStorage";
 
 export default function CalendarScreen({ navigation }) {
     const [tasks, setTasks] = useState([]);
@@ -20,15 +20,23 @@ export default function CalendarScreen({ navigation }) {
     }, [navigation]);
 
     const loadTasks = async () => {
-        const data = await getAllTasks();
-        setTasks(data);
+        try {
+            const data = await getAllTasks();
+            setTasks(data);
 
-        // Ensure selected date stays valid
-        const today = new Date().toISOString().split("T")[0];
-        if (!selectedDate) setSelectedDate(today);
+            // Ensure selected date stays valid
+            const today = new Date().toISOString().split("T")[0];
+            if (!selectedDate) setSelectedDate(today);
+        } catch (error) {
+            Alert.alert("Error", "Failed to load tasks. Please try again.");
+            if (__DEV__) {
+                console.error("Error loading tasks:", error);
+            }
+        }
     };
 
     const tasksForDate = tasks.filter((t) => {
+        if (!t.dueDate) return false;
         const d = t.dueDate.split("T")[0];
         return d === selectedDate;
     });
@@ -37,6 +45,7 @@ export default function CalendarScreen({ navigation }) {
     const marked = {};
 
     tasks.forEach((t) => {
+        if (!t.dueDate) return;
         const dateKey = t.dueDate.split("T")[0];
         if (!marked[dateKey]) {
             marked[dateKey] = { dots: [] };
@@ -44,7 +53,7 @@ export default function CalendarScreen({ navigation }) {
 
         marked[dateKey].dots.push({
             key: t.id,
-            color: t.type === "assessment" ? "#F5A623" : "#6C4AB6",
+            color: getTaskIconColor(t.type),
         });
     });
 
@@ -63,11 +72,12 @@ export default function CalendarScreen({ navigation }) {
             <PurpleCard style={styles.taskCard}>
                 <View style={styles.taskRow}>
                     {/* Icon */}
-                    <Icon
-                        name={item.type === "assessment" ? "event" : "check-circle"}
+                    <IconWithFallback
+                        name={getTaskIconName(item.type)}
                         size={26}
-                        color={item.type === "assessment" ? "#F5A623" : "#6C4AB6"}
+                        color={getTaskIconColor(item.type)}
                         style={{ marginRight: 12 }}
+                        useEmoji={true}
                     />
 
                     {/* Text */}

@@ -7,7 +7,7 @@ import {
     TouchableOpacity,
     ScrollView,
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialIcons";
+import IconWithFallback from "../components/IconWithFallback";
 
 export default function LoginScreen({ navigation }) {
     const [email, setEmail] = useState("");
@@ -40,7 +40,7 @@ export default function LoginScreen({ navigation }) {
                     {/* Email */}
                     <Text style={styles.label}>Email Address</Text>
                     <View style={styles.inputWrapper}>
-                        <Icon name="email" size={20} color="#6C4AB6" />
+                        <IconWithFallback name="email" size={20} color="#6C4AB6" useEmoji={true} />
                         <TextInput
                             style={styles.input}
                             placeholder="Enter your email"
@@ -54,7 +54,7 @@ export default function LoginScreen({ navigation }) {
                     {/* Password */}
                     <Text style={[styles.label, { marginTop: 18 }]}>Password</Text>
                     <View style={styles.inputWrapper}>
-                        <Icon name="lock" size={20} color="#6C4AB6" />
+                        <IconWithFallback name="lock" size={20} color="#6C4AB6" useEmoji={true} />
                         <TextInput
                             style={styles.input}
                             placeholder="Enter your password"

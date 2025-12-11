@@ -8,17 +8,9 @@ import PurpleCard from "../../components/PurpleCard";
 import PurpleInput from "../../components/PurpleInput";
 import PurpleButton from "../../components/PurpleButton";
 
-import { saveTask } from "../../storage/TasksStorage";
+import { saveTask } from "../../data/planner/TasksStorage";
 import { NotificationServiceInstance } from "../../notifications/Notifications";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-/* -----------------------------
- * 获取默认提醒提前时间
- * ----------------------------- */
-async function getReminderOffset() {
-    const value = await AsyncStorage.getItem("REMINDER_OFFSET");
-    return value ? Number(value) : 0;
-}
+import { getReminderOffset, calculateNotificationDate } from "../../utils/taskHelpers";
 
 export default function AddTaskScreen({ navigation }) {
     const [title, setTitle] = useState("");
@@ -37,38 +29,42 @@ export default function AddTaskScreen({ navigation }) {
             return;
         }
 
-        const reminderOffset = await getReminderOffset();
-        const id = uuid.v4();
+        try {
+            const reminderOffset = await getReminderOffset();
+            const id = uuid.v4();
 
-        const newTask = {
-            id,
-            title,
-            desc,
-            type,
-            dueDate: dueDate.toISOString(),
-            completed: false
-        };
+            const newTask = {
+                id,
+                title,
+                desc,
+                type,
+                dueDate: dueDate.toISOString(),
+                completed: false
+            };
 
-        await saveTask(newTask);
+            await saveTask(newTask);
 
-        /* -----------------------------
-         * 🔔 自动调度通知
-         * ----------------------------- */
-        const notifyDate = new Date(
-            new Date(newTask.dueDate).getTime() - reminderOffset * 60 * 1000
-        );
+            /* -----------------------------
+             * 🔔 自动调度通知
+             * ----------------------------- */
+            const notifyDate = calculateNotificationDate(newTask.dueDate, reminderOffset);
+            if (notifyDate) {
+                NotificationServiceInstance.scheduleNotification(
+                    "Upcoming Task",
+                    newTask.title,
+                    notifyDate,
+                    { taskId: newTask.id }
+                );
+            }
 
-        if (notifyDate > new Date()) {
-            NotificationServiceInstance.scheduleNotification(
-                "Upcoming Task",
-                newTask.title,
-                notifyDate,
-                { taskId: newTask.id }
-            );
+            alert("Task saved!");
+            navigation.goBack();
+        } catch (error) {
+            alert("Failed to save task. Please try again.");
+            if (__DEV__) {
+                console.error("Error saving task:", error);
+            }
         }
-
-        alert("Task saved!");
-        navigation.goBack();
     };
 
     return (

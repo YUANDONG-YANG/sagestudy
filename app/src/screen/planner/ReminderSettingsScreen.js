@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import PurpleHeader from "../../components/PurpleHeader";
 import PurpleCard from "../../components/PurpleCard";
 import PurpleButton from "../../components/PurpleButton";
+import { NotificationServiceInstance } from "../../notifications/Notifications";
+import { getAllTasks } from "../../data/planner/TasksStorage";
+import { getReminderOffset, calculateNotificationDate } from "../../utils/taskHelpers";
 
 const REMINDER_KEY = "REMINDER_OFFSET";
 
@@ -32,9 +35,27 @@ export default function ReminderSettingsScreen({ navigation }) {
     };
 
     const saveSetting = async () => {
-        await AsyncStorage.setItem(REMINDER_KEY, String(selected));
-        alert("Reminder settings saved!");
-        navigation.goBack();
+        try {
+            await AsyncStorage.setItem(REMINDER_KEY, String(selected));
+            
+            // 重新调度所有任务的通知（使用新设置）
+            const count = await NotificationServiceInstance.rescheduleAllTaskNotifications(
+                getReminderOffset,
+                getAllTasks,
+                calculateNotificationDate
+            );
+            
+            Alert.alert(
+                "Settings Saved", 
+                `Reminder settings updated. ${count} notifications rescheduled.`
+            );
+            navigation.goBack();
+        } catch (error) {
+            Alert.alert("Error", "Failed to save settings. Please try again.");
+            if (__DEV__) {
+                console.error("Error saving reminder settings:", error);
+            }
+        }
     };
 
     return (

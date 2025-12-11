@@ -6,7 +6,9 @@ import PrivacyPolicyScreen from "../screen/PrivacyPolicyScreen";
 import HelpSupportScreen from "../screen/HelpSupportScreen";
 import ChangePasswordScreen from "../screen/ChangePasswordScreen";
 import ReminderSettingsScreen from "../screen/planner/ReminderSettingsScreen";
-import EditProfileScreen from "../screen/EditProfileScreen";   // <-- 新增
+import EditProfileScreen from "../screen/EditProfileScreen";
+import PlannerStack from "./PlannerStack";
+
 const Stack = createNativeStackNavigator();
 
 export default function ProfileStack() {
@@ -18,7 +20,7 @@ export default function ProfileStack() {
             <Stack.Screen name="HelpSupport" component={HelpSupportScreen} />
             <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
             <Stack.Screen name="ReminderSettings" component={ReminderSettingsScreen} />
-
+            <Stack.Screen name="PlannerStack" component={PlannerStack} />
         </Stack.Navigator>
     );
 }

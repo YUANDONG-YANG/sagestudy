@@ -7,7 +7,7 @@ import {
     TouchableOpacity,
     ScrollView
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialIcons";
+import IconWithFallback from "../components/IconWithFallback";
 
 export default function HomeScreen({ navigation }) {
     const [dailyGoal, setDailyGoal] = useState(20);
@@ -45,7 +45,7 @@ export default function HomeScreen({ navigation }) {
                             onChangeText={setSearchValue}
                         />
                         <TouchableOpacity style={styles.searchButton}>
-                            <Icon name="search" size={22} color="#fff" />
+                            <IconWithFallback name="search" size={22} color="#fff" useEmoji={true} />
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -92,7 +92,7 @@ export default function HomeScreen({ navigation }) {
                         <Text style={styles.modeTitle}>Learn New Words</Text>
                         <Text style={styles.modeDesc}>12 words waiting</Text>
                     </View>
-                    <Icon name="chevron-right" size={28} color="#777" />
+                    <IconWithFallback name="chevron-right" size={28} color="#777" useEmoji={true} />
                 </TouchableOpacity>
 
                 {/* ===== Review ===== */}
@@ -107,7 +107,7 @@ export default function HomeScreen({ navigation }) {
                         <Text style={styles.modeTitle}>Review Words</Text>
                         <Text style={styles.modeDesc}>45 words to review</Text>
                     </View>
-                    <Icon name="chevron-right" size={28} color="#777" />
+                    <IconWithFallback name="chevron-right" size={28} color="#777" useEmoji={true} />
                 </TouchableOpacity>
 
                 {/* ===== Quick Test ===== */}
@@ -122,7 +122,7 @@ export default function HomeScreen({ navigation }) {
                         <Text style={styles.modeTitle}>Quick Test</Text>
                         <Text style={styles.modeDesc}>Challenge yourself</Text>
                     </View>
-                    <Icon name="chevron-right" size={28} color="#777" />
+                    <IconWithFallback name="chevron-right" size={28} color="#777" useEmoji={true} />
                 </TouchableOpacity>
 
                 {/* ===== Weekly Stats ===== */}

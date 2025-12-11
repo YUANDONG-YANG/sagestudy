@@ -1,13 +1,13 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import Icon from "react-native-vector-icons/MaterialIcons";
+import IconWithFallback from "./IconWithFallback";
 
 export default function PurpleHeader({ title, onBack }) {
     return (
         <View style={styles.header}>
             {onBack ? (
                 <TouchableOpacity onPress={onBack} style={styles.backBtn}>
-                    <Icon name="arrow-back" size={26} color="#fff" />
+                    <IconWithFallback name="arrow-back" size={26} color="#fff" useEmoji={true} />
                 </TouchableOpacity>
             ) : (
                 <View style={{ width: 26 }} />

@@ -7,7 +7,7 @@ import {
     TouchableOpacity,
     TextInput,
 } from "react-native";
-import Icon from "react-native-vector-icons/MaterialIcons";
+import IconWithFallback from "../components/IconWithFallback";
 
 export default function ProgressScreen() {
     /* ---------------- Static Demo Data ---------------- */
@@ -63,9 +63,10 @@ export default function ProgressScreen() {
         <ScrollView style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <Text style={styles.headerText}>
-                    <Icon name="bar-chart" size={22} /> My Progress
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <IconWithFallback name="bar-chart" size={22} color="#fff" useEmoji={true} />
+                    <Text style={styles.headerText}> My Progress</Text>
+                </View>
             </View>
 
             {/* Summary Cards */}
@@ -168,7 +169,7 @@ export default function ProgressScreen() {
                         style={styles.searchBtn}
                         onPress={() => console.log("Search:", search)}
                     >
-                        <Icon name="search" size={22} color="#fff" />
+                        <IconWithFallback name="search" size={22} color="#fff" useEmoji={true} />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -189,7 +190,7 @@ export default function ProgressScreen() {
                                     {w.status} · {w.date}
                                 </Text>
                             </View>
-                            <Icon
+                            <IconWithFallback
                                 name={
                                     w.status === "Mastered"
                                         ? "check-circle"
@@ -205,6 +206,7 @@ export default function ProgressScreen() {
                                             ? "#6C4AB6"
                                             : "#FF9800"
                                 }
+                                useEmoji={true}
                             />
                         </View>
                     ))}
@@ -223,10 +225,11 @@ export default function ProgressScreen() {
                                 !a.unlocked && styles.lockedAchievement,
                             ]}
                         >
-                            <Icon
+                            <IconWithFallback
                                 name={a.icon}
                                 size={36}
                                 color={a.unlocked ? "#6C4AB6" : "#bbb"}
+                                useEmoji={true}
                             />
                             <Text
                                 style={[
@@ -247,7 +250,7 @@ export default function ProgressScreen() {
 
                 {recommendations.map((r, i) => (
                     <View key={i} style={styles.recommendCard}>
-                        <Icon name="lightbulb" size={22} color="#FFD740" />
+                        <IconWithFallback name="lightbulb" size={22} color="#FFD740" useEmoji={true} />
                         <Text style={styles.recommendText}>{r}</Text>
                     </View>
                 ))}
@@ -263,7 +266,7 @@ export default function ProgressScreen() {
 function renderSummaryCard(label, value, icon) {
     return (
         <View style={styles.summaryCard}>
-            <Icon name={icon} size={28} color="#6C4AB6" />
+            <IconWithFallback name={icon} size={28} color="#6C4AB6" useEmoji={true} />
             <Text style={styles.summaryValue}>{value}</Text>
             <Text style={styles.summaryLabel}>{label}</Text>
         </View>

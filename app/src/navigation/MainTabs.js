@@ -1,6 +1,6 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Icon from "react-native-vector-icons/MaterialIcons";
+import IconWithFallback from "../components/IconWithFallback";
 
 import HomeScreen from "../screen/HomeScreen";
 import LearnScreen from "../screen/LearnScreen";
@@ -34,7 +34,7 @@ export default function MainTabs() {
                         Profile: "person",
                     };
 
-                    return <Icon name={icons[route.name]} color={color} size={26} />;
+                    return <IconWithFallback name={icons[route.name]} color={color} size={26} useEmoji={true} />;
                 },
             })}
         >

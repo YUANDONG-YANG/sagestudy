@@ -20,7 +20,7 @@ react {
     /* Variants */
     //   The list of variants to that are debuggable. For those we're going to
     //   skip the bundling of the JS bundle and the assets. By default is just 'debug'.
-    //   If you add flavors like lite, prod, etc. you'll have to list your debuggableVariants.
+    //   If you add flavors like lite, prod, etc. you're going to have to list your debuggableVariants.
     // debuggableVariants = ["liteDebug", "prodDebug"]
 
     /* Bundling */
@@ -30,7 +30,7 @@ react {
     //   The command to run when bundling. By default is 'bundle'
     // bundleCommand = "ram-bundle"
     //
-    //   The path to the CLI configuration file. Default is empty.
+    //   The command to run when bundling. By default is 'bundle'
     // bundleConfig = file(../rn-cli.config.js)
     //
     //   The name of the generated asset file containing your JS bundle
@@ -116,4 +116,7 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+    
+    // React Native Vector Icons
+    apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
 }

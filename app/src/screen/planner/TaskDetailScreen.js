@@ -19,18 +19,10 @@ import {
     getTaskById,
     updateTask,
     deleteTask,
-} from "../../storage/TasksStorage";
+} from "../../data/planner/TasksStorage";
 
 import { NotificationServiceInstance } from "../../notifications/Notifications";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
-/* -----------------------------
- * 获取默认提醒提前时间
- * ----------------------------- */
-async function getReminderOffset() {
-    const value = await AsyncStorage.getItem("REMINDER_OFFSET");
-    return value ? Number(value) : 0;
-}
+import { getReminderOffset, calculateNotificationDate } from "../../utils/taskHelpers";
 
 export default function TaskDetailScreen({ route, navigation }) {
     const { taskId } = route.params;
@@ -44,16 +36,24 @@ export default function TaskDetailScreen({ route, navigation }) {
     }, []);
 
     const loadTask = async () => {
-        const t = await getTaskById(taskId);
-        if (!t) {
-            alert("Task not found");
+        try {
+            const t = await getTaskById(taskId);
+            if (!t) {
+                Alert.alert("Error", "Task not found");
+                navigation.goBack();
+                return;
+            }
+            setTask({
+                ...t,
+                dueDate: new Date(t.dueDate),
+            });
+        } catch (error) {
+            Alert.alert("Error", "Failed to load task. Please try again.");
+            if (__DEV__) {
+                console.error("Error loading task:", error);
+            }
             navigation.goBack();
-            return;
         }
-        setTask({
-            ...t,
-            dueDate: new Date(t.dueDate),
-        });
     };
 
     if (!task) return null;
@@ -62,24 +62,22 @@ export default function TaskDetailScreen({ route, navigation }) {
      * 保存修改（含通知更新）
      * ----------------------------- */
     const saveChanges = async () => {
-        const updated = {
-            ...task,
-            dueDate: task.dueDate.toISOString(),
-        };
+        try {
+            const updated = {
+                ...task,
+                dueDate: task.dueDate.toISOString(),
+            };
 
-        await updateTask(updated);
+            await updateTask(updated);
 
-        // 清理旧通知（目前 cancelAll – 可未来改成按 ID 清理）
-        NotificationServiceInstance.cancelAll();
+            // 取消该任务的所有通知
+            await NotificationServiceInstance.cancelTaskNotifications(updated.id);
 
         if (!updated.completed) {
             const reminderOffset = await getReminderOffset();
-
-            const notifyDate = new Date(
-                new Date(updated.dueDate).getTime() - reminderOffset * 60 * 1000
-            );
-
-            if (notifyDate > new Date()) {
+            const notifyDate = calculateNotificationDate(updated.dueDate, reminderOffset);
+            
+            if (notifyDate) {
                 NotificationServiceInstance.scheduleNotification(
                     "Updated Task",
                     updated.title,
@@ -89,32 +87,37 @@ export default function TaskDetailScreen({ route, navigation }) {
             }
         }
 
-        alert("Task updated");
-        navigation.goBack();
+            Alert.alert("Success", "Task updated");
+            navigation.goBack();
+        } catch (error) {
+            Alert.alert("Error", "Failed to update task. Please try again.");
+            if (__DEV__) {
+                console.error("Error updating task:", error);
+            }
+        }
     };
 
     /* -----------------------------
      * 切换完成状态（并更新通知）
      * ----------------------------- */
     const toggleComplete = async () => {
-        const updated = {
-            ...task,
-            completed: !task.completed,
-        };
+        try {
+            const updated = {
+                ...task,
+                completed: !task.completed,
+            };
 
-        await updateTask(updated);
+            await updateTask(updated);
 
-        // 完成任务 → 取消通知
-        NotificationServiceInstance.cancelAll();
+            // 完成任务 → 取消通知
+            await NotificationServiceInstance.cancelTaskNotifications(updated.id);
 
         // 恢复任务 → 重新调度通知
         if (!updated.completed) {
             const reminderOffset = await getReminderOffset();
-            const notifyDate = new Date(
-                new Date(updated.dueDate).getTime() - reminderOffset * 60 * 1000
-            );
-
-            if (notifyDate > new Date()) {
+            const notifyDate = calculateNotificationDate(updated.dueDate, reminderOffset);
+            
+            if (notifyDate) {
                 NotificationServiceInstance.scheduleNotification(
                     "Upcoming Task",
                     updated.title,
@@ -124,7 +127,13 @@ export default function TaskDetailScreen({ route, navigation }) {
             }
         }
 
-        setTask(updated);
+            setTask(updated);
+        } catch (error) {
+            Alert.alert("Error", "Failed to update task. Please try again.");
+            if (__DEV__) {
+                console.error("Error toggling task completion:", error);
+            }
+        }
     };
 
     /* -----------------------------
@@ -142,11 +151,19 @@ export default function TaskDetailScreen({ route, navigation }) {
     };
 
     const removeTask = async () => {
-        await deleteTask(task.id);
+        try {
+            await deleteTask(task.id);
 
-        NotificationServiceInstance.cancelAll();
+            // 取消该任务的所有通知
+            await NotificationServiceInstance.cancelTaskNotifications(task.id);
 
-        navigation.goBack();
+            navigation.goBack();
+        } catch (error) {
+            Alert.alert("Error", "Failed to delete task. Please try again.");
+            if (__DEV__) {
+                console.error("Error deleting task:", error);
+            }
+        }
     };
 
     return (
