@@ -1,0 +1,110 @@
+# ============================================
+# Node / React Native
+# ============================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+dist/
+tmp/
+temp/
+*.log
+
+# Metro bundler
+.expo/
+.expo-shared/
+.expo/*
+
+# Babel
+.babelrc
+babel.config.js
+
+# Jest
+/coverage/
+*.jest.*
+
+# Watchman
+.watchmanconfig
+
+# ============================================
+# TypeScript
+# ============================================
+*.tsbuildinfo
+
+# ============================================
+# React Native build files
+# ============================================
+# Buck
+.buckconfig
+.buckd/
+buck-out/
+
+# React Native bundler
+*.packager
+*.map
+
+# iOS build artifacts
+ios/Pods/
+ios/build/
+ios/DerivedData/
+*.xcworkspace
+*.xcuserstate
+*.xccheckout
+*.xcodeproj/project.xcworkspace
+*.xcodeproj/xcuserdata/
+
+# Android build artifacts
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/.idea/
+android/.cxx/
+
+# Keystore files (never upload!!)
+*.keystore
+*.jks
+
+# ============================================
+# Java / Kotlin
+# ============================================
+*.class
+*.jar
+*.war
+*.ear
+/build/
+
+# Gradle files
+.gradle/
+gradlew
+gradlew.bat
+
+# ============================================
+# IDE / Editor Ignore
+# ============================================
+# VS Code
+.vscode/
+.history/
+
+# IntelliJ / WebStorm
+.idea/
+*.iml
+/out/
+shelf/
+workspace.xml
+httpRequests/
+dataSources/
+dataSources.local.xml
+
+# ============================================
+# OS files
+# ============================================
+.DS_Store
+Thumbs.db
+
+# ============================================
+# Misc
+# ============================================
+.env
+.env.*
