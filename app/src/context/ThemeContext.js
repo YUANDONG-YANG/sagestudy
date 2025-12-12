@@ -38,19 +38,21 @@ const languages = {
         name: "中文",
         flag: "🇨🇳",
     },
+    fr: {
+        code: "fr",
+        name: "Français",
+        flag: "🇫🇷",
+    },
 };
 
 export function ThemeProvider({ children }) {
     const [theme, setTheme] = useState("light");
     const [language, setLanguage] = useState("en");
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        loadSettings();
-    }, []);
+    const [loading, setLoading] = useState(false); // 初始化为false，避免阻塞渲染
 
     const loadSettings = async () => {
         try {
+            setLoading(true);
             const savedTheme = await AsyncStorage.getItem(THEME_STORAGE_KEY);
             const savedLang = await AsyncStorage.getItem(LANG_STORAGE_KEY);
             
@@ -68,6 +70,15 @@ export function ThemeProvider({ children }) {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        // 异步加载设置，不阻塞初始渲染
+        loadSettings();
+    }, []);
+
+    // 确保即使加载失败也提供默认值
+    const currentTheme = themes[theme] || themes.light;
+    const currentLanguage = languages[language] || languages.en;
 
     const changeTheme = async (newTheme) => {
         if (!themes[newTheme]) return;
@@ -96,9 +107,9 @@ export function ThemeProvider({ children }) {
     };
 
     const value = {
-        theme: themes[theme],
+        theme: currentTheme,
         themeName: theme,
-        language: languages[language],
+        language: currentLanguage,
         languageCode: language,
         changeTheme,
         changeLanguage,

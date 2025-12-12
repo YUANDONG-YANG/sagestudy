@@ -13,6 +13,7 @@ import { useContext } from "react";
 import IconWithFallback from "../components/IconWithFallback";
 import VocabularyAPI from "../services/api/vocabularyApi";
 import { AuthContext } from "../context/AuthContext";
+import { ToastContext } from "../context/ToastContext";
 
 export default function HomeScreen({ navigation }) {
     const { user } = useContext(AuthContext);

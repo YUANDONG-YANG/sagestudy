@@ -7,11 +7,16 @@ import AppNavigator from "./src/navigation/AppNavigator";
 import { NotificationServiceInstance } from "./src/notifications/Notifications";
 import { getAllTasks } from "./src/data/planner/TasksStorage";
 import { getReminderOffset, calculateNotificationDate } from "./src/utils/taskHelpers";
+import { ErrorBoundary } from "./src/components/ErrorBoundary";
 
 export default function App() {
     useEffect(() => {
-        // 初始化通知服务
-        initializeNotifications();
+        // 延迟初始化通知服务，避免阻塞应用启动
+        const timer = setTimeout(() => {
+            initializeNotifications();
+        }, 500);
+        
+        return () => clearTimeout(timer);
     }, []);
 
     const initializeNotifications = async () => {
@@ -23,12 +28,20 @@ export default function App() {
                 // 注册通知监听器
                 NotificationServiceInstance.registerListeners();
                 
-                // 重新调度所有任务的通知（应用启动时）
-                await NotificationServiceInstance.rescheduleAllTaskNotifications(
-                    getReminderOffset,
-                    getAllTasks,
-                    calculateNotificationDate
-                );
+                // 延迟重新调度通知，避免阻塞启动
+                setTimeout(async () => {
+                    try {
+                        await NotificationServiceInstance.rescheduleAllTaskNotifications(
+                            getReminderOffset,
+                            getAllTasks,
+                            calculateNotificationDate
+                        );
+                    } catch (error) {
+                        if (__DEV__) {
+                            console.error("Error rescheduling notifications:", error);
+                        }
+                    }
+                }, 1000);
 
                 if (__DEV__) {
                     console.log("✅ Notification service initialized");
@@ -39,8 +52,9 @@ export default function App() {
                 }
             }
         } catch (error) {
+            // 通知初始化失败不应该阻止应用启动
             if (__DEV__) {
-                console.error("Error initializing notifications:", error);
+                console.error("Error initializing notifications (non-critical):", error);
             }
         }
     };
@@ -68,12 +82,14 @@ export default function App() {
     }, []);
 
     return (
-        <ThemeProvider>
-            <ToastProvider>
-                <AuthProvider>
-                    <AppNavigator />
-                </AuthProvider>
-            </ToastProvider>
-        </ThemeProvider>
+        <ErrorBoundary>
+            <ThemeProvider>
+                <ToastProvider>
+                    <AuthProvider>
+                        <AppNavigator />
+                    </AuthProvider>
+                </ToastProvider>
+            </ThemeProvider>
+        </ErrorBoundary>
     );
 }
