@@ -7,6 +7,8 @@ import HelpSupportScreen from "../screen/HelpSupportScreen";
 import ChangePasswordScreen from "../screen/ChangePasswordScreen";
 import ReminderSettingsScreen from "../screen/planner/ReminderSettingsScreen";
 import EditProfileScreen from "../screen/EditProfileScreen";
+import ThemeSettingsScreen from "../screen/ThemeSettingsScreen";
+import LanguageSettingsScreen from "../screen/LanguageSettingsScreen";
 import PlannerStack from "./PlannerStack";
 
 const Stack = createNativeStackNavigator();
@@ -19,6 +21,8 @@ export default function ProfileStack() {
             <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
             <Stack.Screen name="HelpSupport" component={HelpSupportScreen} />
             <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+            <Stack.Screen name="ThemeSettings" component={ThemeSettingsScreen} />
+            <Stack.Screen name="LanguageSettings" component={LanguageSettingsScreen} />
             <Stack.Screen name="ReminderSettings" component={ReminderSettingsScreen} />
             <Stack.Screen name="PlannerStack" component={PlannerStack} />
         </Stack.Navigator>

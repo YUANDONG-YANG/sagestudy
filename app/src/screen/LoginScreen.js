@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
     View,
     Text,
@@ -6,24 +6,49 @@ import {
     TextInput,
     TouchableOpacity,
     ScrollView,
+    ActivityIndicator,
 } from "react-native";
+import { AuthContext } from "../context/AuthContext";
+import { ToastContext } from "../context/ToastContext";
+import LoadingOverlay from "../components/LoadingOverlay";
 import IconWithFallback from "../components/IconWithFallback";
 
 export default function LoginScreen({ navigation }) {
+    const { login } = useContext(AuthContext);
+    const { showSuccess, showError } = useContext(ToastContext);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         if (!email || !password) {
-            alert("Please enter your email and password.");
+            showError("Please enter your email and password.");
             return;
         }
-        navigation.navigate("MainTabs");
+
+        setLoading(true);
+        try {
+            const result = await login(email, password);
+            if (result.success) {
+                showSuccess("Login successful! Welcome back!");
+            } else {
+                showError(result.message || "Login failed. Please try again.");
+            }
+            // 成功后会通过AuthContext自动导航到MainTabs
+        } catch (error) {
+            showError("An unexpected error occurred. Please try again.");
+            if (__DEV__) {
+                console.error("Login error:", error);
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <View style={styles.container}>
+            <LoadingOverlay visible={loading} message="Signing in..." />
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingVertical: 60 }}>
 
                 {/* ===== Logo & Title ===== */}
@@ -75,8 +100,16 @@ export default function LoginScreen({ navigation }) {
                     </TouchableOpacity>
 
                     {/* Login Button */}
-                    <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-                        <Text style={styles.loginText}>Sign In</Text>
+                    <TouchableOpacity 
+                        style={[styles.loginButton, loading && styles.loginButtonDisabled]} 
+                        onPress={handleLogin}
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <ActivityIndicator color="#fff" />
+                        ) : (
+                            <Text style={styles.loginText}>Sign In</Text>
+                        )}
                     </TouchableOpacity>
                 </View>
 
@@ -201,6 +234,9 @@ const styles = StyleSheet.create({
         color: "#ffffff",
         fontSize: 18,
         fontWeight: "700",
+    },
+    loginButtonDisabled: {
+        opacity: 0.6,
     },
 
     /* Bottom Register */

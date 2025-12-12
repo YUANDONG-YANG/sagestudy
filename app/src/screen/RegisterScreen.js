@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
     View,
     Text,
@@ -6,33 +6,54 @@ import {
     TextInput,
     TouchableOpacity,
     ScrollView,
-    Alert,
+    ActivityIndicator,
 } from "react-native";
+import { AuthContext } from "../context/AuthContext";
+import { ToastContext } from "../context/ToastContext";
+import LoadingOverlay from "../components/LoadingOverlay";
 
 export default function RegisterScreen({ navigation }) {
+    const { register } = useContext(AuthContext);
+    const { showSuccess, showError } = useContext(ToastContext);
     const [fullName, setFullName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleRegister = () => {
+    const handleRegister = async () => {
         if (!fullName || !email || !password || !confirmPassword) {
-            Alert.alert("Missing Fields", "Please fill in all fields.");
+            showError("Please fill in all fields.");
             return;
         }
 
         if (password !== confirmPassword) {
-            Alert.alert("Password Error", "Passwords do not match.");
+            showError("Passwords do not match.");
             return;
         }
 
-        // 这里你可以接入真实 API 或本地存储
-        Alert.alert("Success", "Account created successfully!");
-        navigation.navigate("Login");
+        setLoading(true);
+        try {
+            const result = await register(fullName, email, password);
+            if (result.success) {
+                showSuccess("Account created successfully!");
+                // 成功后会通过AuthContext自动导航到MainTabs
+            } else {
+                showError(result.message || "Registration failed. Please try again.");
+            }
+        } catch (error) {
+            showError("An unexpected error occurred. Please try again.");
+            if (__DEV__) {
+                console.error("Register error:", error);
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
+            <LoadingOverlay visible={loading} message="Creating account..." />
             <Text style={styles.title}>Create Account</Text>
 
             {/* Full Name */}
@@ -76,8 +97,16 @@ export default function RegisterScreen({ navigation }) {
             />
 
             {/* Register Button */}
-            <TouchableOpacity style={styles.button} onPress={handleRegister}>
-                <Text style={styles.buttonText}>Sign Up</Text>
+            <TouchableOpacity 
+                style={[styles.button, loading && styles.buttonDisabled]} 
+                onPress={handleRegister}
+                disabled={loading}
+            >
+                {loading ? (
+                    <ActivityIndicator color="#fff" />
+                ) : (
+                    <Text style={styles.buttonText}>Sign Up</Text>
+                )}
             </TouchableOpacity>
 
             {/* Login Redirect */}
@@ -132,5 +161,8 @@ const styles = StyleSheet.create({
         color: "#6C4AB6",
         fontSize: 15,
         marginTop: 10,
+    },
+    buttonDisabled: {
+        opacity: 0.6,
     },
 });

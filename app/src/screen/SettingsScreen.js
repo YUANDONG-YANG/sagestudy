@@ -1,14 +1,34 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
     View,
     Text,
     StyleSheet,
     TouchableOpacity,
     ScrollView,
+    Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { AuthContext } from "../context/AuthContext";
 
 export default function SettingsScreen({ navigation }) {
+    const { logout } = useContext(AuthContext);
+
+    const handleLogout = () => {
+        Alert.alert(
+            "Log Out",
+            "Are you sure you want to log out?",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Log Out",
+                    style: "destructive",
+                    onPress: async () => {
+                        await logout();
+                    },
+                },
+            ]
+        );
+    };
     return (
         <ScrollView style={styles.container}>
             {/* Header */}
@@ -56,14 +76,22 @@ export default function SettingsScreen({ navigation }) {
             {/* APP SETTINGS */}
             <Text style={styles.sectionHeader}>App Settings</Text>
 
-            <TouchableOpacity style={styles.item}>
+            <TouchableOpacity 
+                style={styles.item}
+                onPress={() => navigation.navigate("ThemeSettings")}
+            >
                 <Icon name="color-lens" size={24} color="#667eea" />
                 <Text style={styles.itemText}>Theme</Text>
+                <Icon name="chevron-right" size={24} color="#999" style={{ marginLeft: "auto" }} />
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.item}>
+            <TouchableOpacity 
+                style={styles.item}
+                onPress={() => navigation.navigate("LanguageSettings")}
+            >
                 <Icon name="language" size={24} color="#667eea" />
                 <Text style={styles.itemText}>Language</Text>
+                <Icon name="chevron-right" size={24} color="#999" style={{ marginLeft: "auto" }} />
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -77,7 +105,7 @@ export default function SettingsScreen({ navigation }) {
             {/* LOGOUT */}
             <TouchableOpacity
                 style={styles.logoutButton}
-                onPress={() => alert("Logged out.")}
+                onPress={handleLogout}
             >
                 <Icon name="logout" size={22} color="#fff" />
                 <Text style={styles.logoutText}>Log Out</Text>

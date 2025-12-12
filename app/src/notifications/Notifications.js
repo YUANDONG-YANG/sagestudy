@@ -279,38 +279,48 @@ class NotificationService {
      * ----------------------------- */
     async cancelAll() {
         try {
-            // react-native-notifications v5 的正确 API
-            // 使用 commands.cancelAllLocalNotifications() 方法
-            if (Notifications.commands && typeof Notifications.commands.cancelAllLocalNotifications === 'function') {
-                Notifications.commands.cancelAllLocalNotifications();
-            } else if (Platform.OS === 'ios' && Notifications.ios && typeof Notifications.ios.cancelAllLocalNotifications === 'function') {
-                Notifications.ios.cancelAllLocalNotifications();
-            } else {
-                // 如果没有批量取消方法，则逐个取消所有已知的通知
-                const allIds = Array.from(this.notificationIdMap.keys());
-                for (const notifId of allIds) {
-                    try {
-                        if (typeof Notifications.cancelLocalNotification === 'function') {
-                            Notifications.cancelLocalNotification(notifId);
-                        }
-                    } catch (e) {
-                        // 忽略单个取消错误
-                        if (__DEV__) {
-                            console.warn(`Failed to cancel notification ${notifId}:`, e);
-                        }
+            // 直接使用逐个取消的方式，避免使用有问题的批量取消API
+            // 这是最安全可靠的方法
+            const allIds = Array.from(this.notificationIdMap.keys());
+            let cancelledCount = 0;
+            
+            for (const notifId of allIds) {
+                try {
+                    // 尝试不同的取消API
+                    if (typeof Notifications.cancelLocalNotification === 'function') {
+                        Notifications.cancelLocalNotification(notifId);
+                        cancelledCount++;
+                    } else if (typeof Notifications.cancelNotification === 'function') {
+                        Notifications.cancelNotification(notifId);
+                        cancelledCount++;
+                    }
+                } catch (e) {
+                    // 忽略单个取消错误，继续处理其他通知
+                    if (__DEV__) {
+                        console.warn(`Failed to cancel notification ${notifId}:`, e.message);
                     }
                 }
             }
             
+            // 清除映射，无论是否成功取消
             this.notificationIdMap.clear();
             await this.saveNotificationIds();
             
             if (__DEV__) {
-                console.log("🗑️ Cancelled all notifications");
+                console.log(`🗑️ Cancelled ${cancelledCount} notifications`);
             }
         } catch (error) {
+            // 即使出错也清除映射，避免数据不一致
+            this.notificationIdMap.clear();
+            try {
+                await this.saveNotificationIds();
+            } catch (e) {
+                // 忽略保存错误
+            }
+            
             if (__DEV__) {
-                console.error("Error canceling all notifications:", error);
+                // 只记录警告，不记录错误，因为这不是致命问题
+                console.warn("Some notifications may not have been cancelled (non-critical):", error.message);
             }
         }
     }

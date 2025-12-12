@@ -1,5 +1,8 @@
 import React, { useEffect } from "react";
 import { AppState } from "react-native";
+import { AuthProvider } from "./src/context/AuthContext";
+import { ToastProvider } from "./src/context/ToastContext";
+import { ThemeProvider } from "./src/context/ThemeContext";
 import AppNavigator from "./src/navigation/AppNavigator";
 import { NotificationServiceInstance } from "./src/notifications/Notifications";
 import { getAllTasks } from "./src/data/planner/TasksStorage";
@@ -64,5 +67,13 @@ export default function App() {
         return () => subscription?.remove();
     }, []);
 
-    return <AppNavigator />;
+    return (
+        <ThemeProvider>
+            <ToastProvider>
+                <AuthProvider>
+                    <AppNavigator />
+                </AuthProvider>
+            </ToastProvider>
+        </ThemeProvider>
+    );
 }

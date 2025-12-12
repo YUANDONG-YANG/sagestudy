@@ -54,8 +54,19 @@ export function getTaskIconColor(type) {
  */
 export function formatDate(date) {
     if (!date) return "";
-    const d = new Date(date);
-    return d.toISOString().split("T")[0];
+    try {
+        const d = new Date(date);
+        if (isNaN(d.getTime())) {
+            // 无效日期
+            return "";
+        }
+        return d.toISOString().split("T")[0];
+    } catch (error) {
+        if (__DEV__) {
+            console.error("Error formatting date:", error);
+        }
+        return "";
+    }
 }
 
 /**
@@ -74,4 +85,5 @@ export async function safeAsync(asyncFn, errorMessage = "操作失败") {
         throw error;
     }
 }
+
 

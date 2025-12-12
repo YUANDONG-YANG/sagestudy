@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
     View,
     Text,
@@ -7,13 +7,26 @@ import {
     TouchableOpacity,
     Image,
     TextInput,
+    ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import VocabularyAPI from "../services/api/vocabularyApi";
+import { initializeWords } from "../data/learning/InitialWords";
+import { ToastContext } from "../context/ToastContext";
+import LoadingOverlay from "../components/LoadingOverlay";
 
 export default function LearnScreen({ navigation }) {
-    const [selectedOption, setSelectedOption] = useState("C");
+    const { showSuccess, showError } = useContext(ToastContext);
+    const [currentWord, setCurrentWord] = useState(null);
+    const [wordsToLearn, setWordsToLearn] = useState([]);
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [selectedOption, setSelectedOption] = useState(null);
     const [confidence, setConfidence] = useState(3);
     const [notes, setNotes] = useState("");
+    const [difficulty, setDifficulty] = useState("medium");
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [options, setOptions] = useState([]);
 
     const confidenceLabel = {
         1: "Level 1 - Need Practice",
@@ -23,8 +36,146 @@ export default function LearnScreen({ navigation }) {
         5: "Level 5 - Mastered",
     };
 
+    useEffect(() => {
+        loadWords();
+    }, []);
+
+    useEffect(() => {
+        if (wordsToLearn.length > 0 && currentIndex < wordsToLearn.length) {
+            setupCurrentWord(wordsToLearn[currentIndex]);
+        }
+    }, [currentIndex, wordsToLearn]);
+
+    const loadWords = async () => {
+        try {
+            setLoading(true);
+            // 初始化词汇（如果需要）
+            await initializeWords();
+
+            // 使用API获取词汇
+            const allWords = await VocabularyAPI.getAllWords();
+            const learningWords = allWords.filter(
+                (w) => w.status === "learning" || !w.lastReviewed
+            );
+
+            let wordsToSet = [];
+            if (learningWords.length === 0) {
+                // 如果没有学习中的词汇，从所有词汇中选择
+                wordsToSet = allWords.slice(0, 12); // 最多12个词汇
+            } else {
+                wordsToSet = learningWords.slice(0, 12);
+            }
+            
+            if (wordsToSet.length === 0) {
+                showError("No words available to learn. Please add some words first.");
+                navigation.goBack();
+                return;
+            }
+            
+            setWordsToLearn(wordsToSet);
+            setCurrentIndex(0); // 重置索引
+        } catch (error) {
+            showError("Failed to load words. Please try again.");
+            if (__DEV__) {
+                console.error("Load words error:", error);
+            }
+            navigation.goBack();
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const setupCurrentWord = (word) => {
+        setCurrentWord(word);
+        setNotes(word.notes || "");
+        setConfidence(word.confidence || 3);
+        setDifficulty(word.difficulty || "medium");
+        setSelectedOption(null);
+
+        // 生成选项（包括正确答案和其他3个随机单词）
+        generateOptions(word);
+    };
+
+    const generateOptions = (word) => {
+        // 这里简化处理，实际应该从词汇库中选择相关单词
+        const wrongOptions = ["Banana", "Orange", "Grapes"];
+        const allOptions = [
+            { label: word.word, correct: true },
+            { label: wrongOptions[0], correct: false },
+            { label: wrongOptions[1], correct: false },
+            { label: wrongOptions[2], correct: false },
+        ];
+
+        // 随机打乱选项
+        const shuffled = allOptions.sort(() => Math.random() - 0.5);
+        setOptions(shuffled);
+    };
+
+    const handleNext = async () => {
+        if (!currentWord) return;
+
+        setSaving(true);
+        try {
+            // 保存完整的学习进度，包括难度、信心等级、笔记等
+            await VocabularyAPI.updateWordProgress(currentWord.id, {
+                difficulty: difficulty,
+                confidence: confidence,
+                notes: notes,
+                lastReviewed: new Date().toISOString(),
+                // 如果信心等级很高，更新状态
+                status: confidence >= 4 ? "mastered" : confidence >= 3 ? "learning" : "review",
+            });
+
+            // 更新学习历史
+            await VocabularyAPI.updateStudyHistory(5, 1); // 5分钟，1个词
+
+            // 移动到下一个单词
+            if (currentIndex < wordsToLearn.length - 1) {
+                setCurrentIndex(currentIndex + 1);
+                showSuccess("Progress saved!");
+            } else {
+                // 完成所有单词
+                showSuccess("Congratulations! You've completed this learning session!");
+                setTimeout(() => {
+                    navigation.goBack();
+                }, 1500);
+            }
+        } catch (error) {
+            showError("Failed to save progress. Please try again.");
+            if (__DEV__) {
+                console.error("Save progress error:", error);
+            }
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleSkip = () => {
+        if (currentIndex < wordsToLearn.length - 1) {
+            setCurrentIndex(currentIndex + 1);
+        } else {
+            navigation.goBack();
+        }
+    };
+
+    if (loading || !currentWord || wordsToLearn.length === 0) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#6C4AB6" />
+                <Text style={styles.loadingText}>
+                    {loading ? "Loading words..." : "No words available"}
+                </Text>
+            </View>
+        );
+    }
+
+    const progress = wordsToLearn.length > 0 
+        ? ((currentIndex + 1) / wordsToLearn.length) * 100 
+        : 0;
+
     return (
         <View style={styles.container}>
+            <LoadingOverlay visible={saving} message="Saving progress..." />
             {/* ===== Header / Progress Bar ===== */}
             <View style={styles.topBar}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -33,60 +184,94 @@ export default function LearnScreen({ navigation }) {
 
                 <View style={styles.progressWrapper}>
                     <View style={styles.progressTrack}>
-                        <View style={[styles.progressFill, { width: "25%" }]} />
+                        <View style={[styles.progressFill, { width: `${progress}%` }]} />
                     </View>
                 </View>
 
-                <Text style={styles.progressCount}>3/12</Text>
+                <Text style={styles.progressCount}>
+                    {currentIndex + 1}/{wordsToLearn.length}
+                </Text>
             </View>
 
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 50 }}>
-
                 {/* ===== Difficulty Card ===== */}
                 <View style={styles.card}>
                     <Text style={styles.cardTitle}>🎚 Difficulty Level</Text>
 
                     <View style={styles.diffRow}>
-                        <DiffButton label="😊 Easy" color="#DFF8E3" />
-                        <DiffButton label="😐 Medium" color="#FFF4C6" />
-                        <DiffButton label="😟 Hard" color="#FFD9D9" />
+                        <TouchableOpacity
+                            style={[
+                                styles.diffButton,
+                                { backgroundColor: difficulty === "easy" ? "#DFF8E3" : "#EEE" },
+                            ]}
+                            onPress={() => setDifficulty("easy")}
+                        >
+                            <Text style={styles.diffText}>😊 Easy</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[
+                                styles.diffButton,
+                                { backgroundColor: difficulty === "medium" ? "#FFF4C6" : "#EEE" },
+                            ]}
+                            onPress={() => setDifficulty("medium")}
+                        >
+                            <Text style={styles.diffText}>😐 Medium</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                            style={[
+                                styles.diffButton,
+                                { backgroundColor: difficulty === "hard" ? "#FFD9D9" : "#EEE" },
+                            ]}
+                            onPress={() => setDifficulty("hard")}
+                        >
+                            <Text style={styles.diffText}>😟 Hard</Text>
+                        </TouchableOpacity>
                     </View>
                 </View>
 
                 {/* ===== Word Card ===== */}
                 <View style={styles.wordCard}>
-                    <Image
-                        source={{
-                            uri: "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=600",
-                        }}
-                        style={styles.wordImage}
-                    />
+                    {currentWord.imageUrl && (
+                        <Image source={{ uri: currentWord.imageUrl }} style={styles.wordImage} />
+                    )}
 
-                    <Text style={styles.wordTitle}>Apple</Text>
+                    <Text style={styles.wordTitle}>{currentWord.word}</Text>
 
-                    <View style={styles.pronounceRow}>
-                        <Text style={styles.pronounceText}>/ˈæpl/</Text>
-                        <TouchableOpacity style={styles.voiceBtn}>
-                            <Icon name="volume-up" size={20} color="#6C4AB6" />
-                        </TouchableOpacity>
-                    </View>
+                    {currentWord.pronunciation && (
+                        <View style={styles.pronounceRow}>
+                            <Text style={styles.pronounceText}>{currentWord.pronunciation}</Text>
+                            <TouchableOpacity 
+                                style={styles.voiceBtn}
+                                onPress={() => {
+                                    // 语音播放功能（需要TTS库）
+                                    showSuccess(`Pronunciation: ${currentWord.pronunciation}`);
+                                }}
+                            >
+                                <Icon name="volume-up" size={20} color="#6C4AB6" />
+                            </TouchableOpacity>
+                        </View>
+                    )}
 
                     <View style={styles.definitionBox}>
                         <Text style={styles.badge}>n. 名词</Text>
-                        <Text style={styles.definition}>苹果；苹果树</Text>
+                        <Text style={styles.definition}>
+                            {currentWord.translation || currentWord.definition}
+                        </Text>
                     </View>
 
                     {/* Example */}
-                    <View style={styles.exampleBox}>
-                        <Text style={styles.exampleTitle}>💬 Example</Text>
+                    {currentWord.example && (
+                        <View style={styles.exampleBox}>
+                            <Text style={styles.exampleTitle}>💬 Example</Text>
 
-                        <View style={styles.exampleCard}>
-                            <Text>
-                                I eat an <Text style={{ fontWeight: "bold" }}>apple</Text> every day.
-                            </Text>
-                            <Text style={styles.exampleCN}>我每天吃一个苹果。</Text>
+                            <View style={styles.exampleCard}>
+                                <Text>{currentWord.example}</Text>
+                                {currentWord.exampleTranslation && (
+                                    <Text style={styles.exampleCN}>{currentWord.exampleTranslation}</Text>
+                                )}
+                            </View>
                         </View>
-                    </View>
+                    )}
                 </View>
 
                 {/* ===== Notes ===== */}
@@ -101,54 +286,40 @@ export default function LearnScreen({ navigation }) {
                         onChangeText={setNotes}
                     />
 
-                    <Text style={styles.tipText}>
-                        💡 Writing short notes helps reinforce memory!
-                    </Text>
+                    <Text style={styles.tipText}>💡 Writing short notes helps reinforce memory!</Text>
                 </View>
 
                 {/* ===== Image Selection Question ===== */}
-                <Text style={styles.selectionPrompt}>
-                    ✔ Select the image that matches "Apple"
-                </Text>
+                {options.length > 0 && (
+                    <>
+                        <Text style={styles.selectionPrompt}>
+                            ✔ Select the image that matches "{currentWord.word}"
+                        </Text>
 
-                <View style={styles.optionsGrid}>
-                    <ImageOption
-                        label="Banana"
-                        img="https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=200"
-                        selected={selectedOption === "A"}
-                        onPress={() => setSelectedOption("A")}
-                    />
-
-                    <ImageOption
-                        label="Orange"
-                        img="https://images.unsplash.com/photo-1582979512210-99b6a53386f9?w=200"
-                        selected={selectedOption === "B"}
-                        onPress={() => setSelectedOption("B")}
-                    />
-
-                    <ImageOption
-                        label="Apple ✓"
-                        img="https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=200"
-                        selected={selectedOption === "C"}
-                        onPress={() => setSelectedOption("C")}
-                    />
-
-                    <ImageOption
-                        label="Grapes"
-                        img="https://images.unsplash.com/photo-1537640538966-79f369143f8f?w=200"
-                        selected={selectedOption === "D"}
-                        onPress={() => setSelectedOption("D")}
-                    />
-                </View>
+                        <View style={styles.optionsGrid}>
+                            {options.map((option, index) => (
+                                <ImageOption
+                                    key={index}
+                                    label={option.label}
+                                    img={
+                                        option.correct && currentWord.imageUrl
+                                            ? currentWord.imageUrl
+                                            : "https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?w=200"
+                                    }
+                                    selected={selectedOption === index}
+                                    onPress={() => setSelectedOption(index)}
+                                />
+                            ))}
+                        </View>
+                    </>
+                )}
 
                 {/* ===== Confidence Slider ===== */}
                 <View style={styles.card}>
                     <Text style={styles.cardTitle}>😊 Confidence Level</Text>
 
                     <View style={styles.center}>
-                        <Text style={styles.confidenceBadge}>
-                            {confidenceLabel[confidence]}
-                        </Text>
+                        <Text style={styles.confidenceBadge}>{confidenceLabel[confidence]}</Text>
                     </View>
 
                     <View style={styles.confRow}>
@@ -176,13 +347,42 @@ export default function LearnScreen({ navigation }) {
 
                 {/* ===== Action Buttons ===== */}
                 <View style={styles.actionRow}>
-                    <ActionBtn bg="#F3EFFF" icon="flag" color="#6C4AB6" />
-                    <ActionBtn bg="#E8F4FF" icon="bookmark" color="#6C4AB6" />
-                    <ActionBtn bg="#6C4AB6" icon="arrow-forward" color="#fff" />
+                    <TouchableOpacity
+                        style={[styles.actionBtn, { backgroundColor: "#F3EFFF" }]}
+                        onPress={handleSkip}
+                    >
+                        <Icon name="flag" size={26} color="#6C4AB6" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.actionBtn, { backgroundColor: "#E8F4FF" }]}
+                        onPress={async () => {
+                            if (!currentWord) return;
+                            try {
+                                // 将单词标记为收藏（更新单词的favorite字段）
+                                await VocabularyAPI.updateWordProgress(currentWord.id, {
+                                    favorite: true,
+                                });
+                                showSuccess("Word saved to favorites! ⭐");
+                            } catch (error) {
+                                showError("Failed to save to favorites.");
+                                if (__DEV__) {
+                                    console.error("Favorite error:", error);
+                                }
+                            }
+                        }}
+                    >
+                        <Icon name="bookmark" size={26} color="#6C4AB6" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.actionBtn, { backgroundColor: "#6C4AB6" }]}
+                        onPress={handleNext}
+                    >
+                        <Icon name="arrow-forward" size={26} color="#fff" />
+                    </TouchableOpacity>
                 </View>
 
                 {/* Skip */}
-                <TouchableOpacity style={styles.skipBtn}>
+                <TouchableOpacity style={styles.skipBtn} onPress={handleSkip}>
                     <Text style={styles.skipText}>Skip this word →</Text>
                 </TouchableOpacity>
 
@@ -193,19 +393,12 @@ export default function LearnScreen({ navigation }) {
                         Try making your own sentences to improve memory retention!
                     </Text>
                 </View>
-
             </ScrollView>
         </View>
     );
 }
 
 /* ---------------- Helper Components ---------------- */
-
-const DiffButton = ({ label, color }) => (
-    <View style={[styles.diffButton, { backgroundColor: color }]}>
-        <Text style={styles.diffText}>{label}</Text>
-    </View>
-);
 
 const ImageOption = ({ img, label, onPress, selected }) => (
     <TouchableOpacity
@@ -217,16 +410,21 @@ const ImageOption = ({ img, label, onPress, selected }) => (
     </TouchableOpacity>
 );
 
-const ActionBtn = ({ bg, icon, color }) => (
-    <TouchableOpacity style={[styles.actionBtn, { backgroundColor: bg }]}>
-        <Icon name={icon} size={26} color={color} />
-    </TouchableOpacity>
-);
-
 /* ================= Styles (Unified Purple Theme) ================= */
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: "#ffffff" },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#ffffff",
+    },
+    loadingText: {
+        marginTop: 10,
+        color: "#777",
+        fontSize: 16,
+    },
 
     /* Header */
     topBar: {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import {
     View,
     Text,
@@ -7,18 +7,16 @@ import {
     TouchableOpacity,
     ScrollView,
     Switch,
-    LayoutAnimation,
-    UIManager,
     Platform,
     Alert,
+    ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-
-if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
-    UIManager.setLayoutAnimationEnabledExperimental(true);
-}
+import { AuthContext } from "../context/AuthContext";
+import authService from "../services/authService";
 
 export default function ChangePasswordScreen({ navigation }) {
+    const { user } = useContext(AuthContext);
     const [currentPassword, setCurrentPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -28,6 +26,7 @@ export default function ChangePasswordScreen({ navigation }) {
     const [showConfirm, setShowConfirm] = useState(false);
 
     const [logoutDevices, setLogoutDevices] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     /* ---- Password Strength ---- */
     const getStrength = () => {
@@ -58,10 +57,35 @@ export default function ChangePasswordScreen({ navigation }) {
         /[a-zA-Z]/.test(newPassword) &&
         /\d/.test(newPassword);
 
-    const handleSubmit = () => {
-        Alert.alert("Success", "Your password has been changed successfully.", [
-            { text: "OK", onPress: () => navigation.goBack() },
-        ]);
+    const handleSubmit = async () => {
+        if (!user?.email) {
+            Alert.alert("Error", "User information not found. Please log in again.");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const result = await authService.changePassword(
+                user.email,
+                currentPassword,
+                newPassword
+            );
+
+            if (result.success) {
+                Alert.alert("Success", "Your password has been changed successfully.", [
+                    { text: "OK", onPress: () => navigation.goBack() },
+                ]);
+            } else {
+                Alert.alert("Error", result.message);
+            }
+        } catch (error) {
+            Alert.alert("Error", "An unexpected error occurred. Please try again.");
+            if (__DEV__) {
+                console.error("Change password error:", error);
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -172,14 +196,18 @@ export default function ChangePasswordScreen({ navigation }) {
 
                     {/* Submit Button */}
                     <TouchableOpacity
-                        disabled={!isFormValid}
+                        disabled={!isFormValid || loading}
                         onPress={handleSubmit}
                         style={[
                             styles.primaryBtn,
-                            !isFormValid && { opacity: 0.4 },
+                            (!isFormValid || loading) && { opacity: 0.4 },
                         ]}
                     >
-                        <Text style={styles.primaryBtnText}>Change Password</Text>
+                        {loading ? (
+                            <ActivityIndicator color="#fff" />
+                        ) : (
+                            <Text style={styles.primaryBtnText}>Change Password</Text>
+                        )}
                     </TouchableOpacity>
 
                     <TouchableOpacity onPress={() => navigation.goBack()} style={styles.cancelBtn}>

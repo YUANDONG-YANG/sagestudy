@@ -7,14 +7,8 @@ import {
     ScrollView,
     LayoutAnimation,
     Platform,
-    UIManager
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
-
-// Android 启用动画
-if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
-    UIManager.setLayoutAnimationEnabledExperimental(true);
-}
 
 export default function PrivacyPolicyScreen({ navigation }) {
     const [openSection, setOpenSection] = useState(null);

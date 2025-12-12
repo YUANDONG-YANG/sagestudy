@@ -1,4 +1,4 @@
-import React, {useEffect, useState, useCallback} from "react";
+import React, {useEffect, useState, useCallback, useContext} from "react";
 import {
     View,
     Text,
@@ -6,29 +6,78 @@ import {
     Image,
     TouchableOpacity,
     ScrollView,
+    Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {useFocusEffect} from "@react-navigation/native";
+import { AuthContext } from "../context/AuthContext";
+import VocabularyAPI from "../services/api/vocabularyApi";
 
 export default function ProfileScreen({navigation}) {
+    const { user, logout } = useContext(AuthContext);
     const [profile, setProfile] = useState({
         name: "SageStudy Student",
         email: "",
         phone: "",
+    });
+    const [stats, setStats] = useState({
+        wordsLearned: 0,
+        streak: 0,
+        quizzesPassed: 0,
     });
 
     const loadProfile = async () => {
         const saved = await AsyncStorage.getItem("userProfile");
         if (saved) {
             setProfile(JSON.parse(saved));
+        } else if (user) {
+            setProfile({
+                name: user.name || "SageStudy Student",
+                email: user.email || "",
+                phone: "",
+            });
         }
+    };
+
+    const loadStats = async () => {
+        try {
+            const studyStats = await VocabularyAPI.getStudyStats();
+            const history = await VocabularyAPI.getStudyHistory();
+            setStats({
+                wordsLearned: studyStats.mastered,
+                streak: history.streak || 0,
+                quizzesPassed: Math.floor(studyStats.totalWords / 10), // 简化计算
+            });
+        } catch (error) {
+            if (__DEV__) {
+                console.error("Load profile stats error:", error);
+            }
+        }
+    };
+
+    const handleLogout = () => {
+        Alert.alert(
+            "Log Out",
+            "Are you sure you want to log out?",
+            [
+                { text: "Cancel", style: "cancel" },
+                {
+                    text: "Log Out",
+                    style: "destructive",
+                    onPress: async () => {
+                        await logout();
+                    },
+                },
+            ]
+        );
     };
 
     // 每次页面聚焦时刷新
     useFocusEffect(
         useCallback(() => {
             loadProfile();
+            loadStats();
         }, [])
     );
 
@@ -62,9 +111,9 @@ export default function ProfileScreen({navigation}) {
 
             {/* Stats Row */}
             <View style={styles.statsRow}>
-                {renderStat("126", "Words Learned")}
-                {renderStat("8", "Days Streak")}
-                {renderStat("5", "Quizzes Passed")}
+                {renderStat(stats.wordsLearned.toString(), "Words Learned")}
+                {renderStat(stats.streak.toString(), "Days Streak")}
+                {renderStat(stats.quizzesPassed.toString(), "Quizzes Passed")}
             </View>
 
             {/* Account */}
@@ -81,14 +130,18 @@ export default function ProfileScreen({navigation}) {
 
             {/* App */}
             <Text style={styles.sectionHeader}>App</Text>
-            {renderItem("color-lens", "Theme")}
-            {renderItem("language", "Language")}
+            {renderItem("color-lens", "Theme", () =>
+                navigation.navigate("ThemeSettings")
+            )}
+            {renderItem("language", "Language", () =>
+                navigation.navigate("LanguageSettings")
+            )}
             {renderItem("help", "Help & Feedback", () =>
                 navigation.navigate("HelpSupport")
             )}
 
             {/* Logout */}
-            <TouchableOpacity style={styles.logoutButton}>
+            <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
                 <Text style={styles.logoutText}>Log Out</Text>
             </TouchableOpacity>
 

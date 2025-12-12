@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     View,
     Text,
@@ -8,16 +8,12 @@ import {
     ScrollView,
     LayoutAnimation,
     Platform,
-    UIManager,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
-if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
-    UIManager.setLayoutAnimationEnabledExperimental(true);
-}
-
 export default function HelpSupportScreen({ navigation }) {
     const [search, setSearch] = useState("");
+    const [filteredFAQ, setFilteredFAQ] = useState([]);
     const [form, setForm] = useState({
         issueType: "",
         subject: "",
@@ -87,8 +83,9 @@ export default function HelpSupportScreen({ navigation }) {
                             placeholder="What can we help you with?"
                             value={search}
                             onChangeText={setSearch}
+                            onSubmitEditing={handleSearch}
                         />
-                        <TouchableOpacity style={styles.searchBtn}>
+                        <TouchableOpacity style={styles.searchBtn} onPress={handleSearch}>
                             <Icon name="search" size={22} color="#fff" />
                         </TouchableOpacity>
                     </View>
@@ -100,22 +97,34 @@ export default function HelpSupportScreen({ navigation }) {
                         <Icon name="question-answer" size={20} color="#6C4AB6" /> Frequently Asked Questions
                     </Text>
 
-                    {FAQ.map((item, i) => (
-                        <View key={i} style={styles.faqItem}>
-                            <TouchableOpacity onPress={() => toggle(i)} style={styles.faqHeader}>
-                                <Text style={styles.faqQuestion}>{item.q}</Text>
-                                <Icon
-                                    name={open === i ? "expand-less" : "expand-more"}
-                                    size={26}
-                                    color="#777"
-                                />
-                            </TouchableOpacity>
-
-                            {open === i && (
-                                <Text style={styles.faqAnswer}>{item.a}</Text>
-                            )}
+                    {filteredFAQ.length === 0 ? (
+                        <View style={styles.emptySearchContainer}>
+                            <Text style={styles.emptySearchText}>
+                                No results found for "{search}"
+                            </Text>
                         </View>
-                    ))}
+                    ) : (
+                        filteredFAQ.map((item, i) => {
+                            // 找到原始FAQ中的索引用于toggle
+                            const originalIndex = FAQ.findIndex(faq => faq.q === item.q);
+                            return (
+                                <View key={i} style={styles.faqItem}>
+                                    <TouchableOpacity onPress={() => toggle(originalIndex)} style={styles.faqHeader}>
+                                        <Text style={styles.faqQuestion}>{item.q}</Text>
+                                        <Icon
+                                            name={open === originalIndex ? "expand-less" : "expand-more"}
+                                            size={26}
+                                            color="#777"
+                                        />
+                                    </TouchableOpacity>
+
+                                    {open === originalIndex && (
+                                        <Text style={styles.faqAnswer}>{item.a}</Text>
+                                    )}
+                                </View>
+                            );
+                        })
+                    )}
                 </View>
 
                 {/* Quick Help Grid */}
@@ -373,5 +382,14 @@ const styles = StyleSheet.create({
     infoValue: {
         marginTop: 4,
         color: "#555",
+    },
+    emptySearchContainer: {
+        padding: 20,
+        alignItems: "center",
+    },
+    emptySearchText: {
+        fontSize: 16,
+        color: "#666",
+        fontStyle: "italic",
     },
 });

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import {
     View,
     Text,
@@ -6,19 +6,34 @@ import {
     ScrollView,
     TouchableOpacity,
     TextInput,
+    ActivityIndicator,
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import IconWithFallback from "../components/IconWithFallback";
+import VocabularyAPI from "../services/api/vocabularyApi";
+import { ToastContext } from "../context/ToastContext";
 
-export default function ProgressScreen() {
-    /* ---------------- Static Demo Data ---------------- */
+export default function ProgressScreen({ route }) {
+    const { showError } = useContext(ToastContext);
+    const [summary, setSummary] = useState({
+        totalWords: 0,
+        masteryRate: 0,
+        streak: 0,
+        studyTime: "0h 0m",
+    });
+    const [vocabularyStatus, setVocabularyStatus] = useState({
+        mastered: 0,
+        learning: 0,
+        review: 0,
+    });
+    const [recentWords, setRecentWords] = useState([]);
+    const [filteredWords, setFilteredWords] = useState([]);
+    const [search, setSearch] = useState(route?.params?.searchQuery || "");
+    const [filterStatus, setFilterStatus] = useState("All");
+    const [filterDays, setFilterDays] = useState("7");
+    const [loading, setLoading] = useState(true);
 
-    const summary = {
-        totalWords: 126,
-        masteryRate: 68,
-        streak: 8,
-        studyTime: "3h 24m",
-    };
-
+    // 每周活动数据（简化版本，可以后续增强）
     const weeklyActivity = [
         { day: "M", value: 2 },
         { day: "T", value: 5 },
@@ -29,23 +44,11 @@ export default function ProgressScreen() {
         { day: "S", value: 2 },
     ];
 
-    const vocabularyStatus = {
-        mastered: 30,
-        learning: 60,
-        review: 36,
-    };
-
-    const recentWords = [
-        { word: "Photosynthesis", status: "Mastered", date: "2024-11-22" },
-        { word: "Ecosystem", status: "Learning", date: "2024-11-21" },
-        { word: "Molecule", status: "Review", date: "2024-11-21" },
-    ];
-
     const achievements = [
-        { icon: "local-fire-department", name: "7-Day Streak", unlocked: true },
-        { icon: "star", name: "50 Words Learned", unlocked: true },
-        { icon: "emoji-events", name: "Mastery Level 1", unlocked: false },
-        { icon: "workspace-premium", name: "Consistency Badge", unlocked: false },
+        { icon: "local-fire-department", name: "7-Day Streak", unlocked: summary.streak >= 7 },
+        { icon: "star", name: "50 Words Learned", unlocked: summary.totalWords >= 50 },
+        { icon: "emoji-events", name: "Mastery Level 1", unlocked: vocabularyStatus.mastered >= 30 },
+        { icon: "workspace-premium", name: "Consistency Badge", unlocked: summary.streak >= 30 },
     ];
 
     const recommendations = [
@@ -54,10 +57,98 @@ export default function ProgressScreen() {
         "Try a short quiz to reinforce mastery.",
     ];
 
-    /* ---------------- State ---------------- */
-    const [search, setSearch] = useState("");
-    const [filterStatus, setFilterStatus] = useState("All");
-    const [filterDays, setFilterDays] = useState("7");
+    useFocusEffect(
+        useCallback(() => {
+            loadData();
+        }, [])
+    );
+
+    useEffect(() => {
+        filterWords();
+    }, [search, filterStatus, recentWords]);
+
+    const loadData = async () => {
+        try {
+            setLoading(true);
+            // 使用API获取数据
+            const stats = await VocabularyAPI.getStudyStats();
+            const history = await VocabularyAPI.getStudyHistory();
+            const recent = await VocabularyAPI.getRecentWords(10);
+
+            // 格式化学习时间
+            const hours = Math.floor(history.totalStudyTime / 60);
+            const minutes = history.totalStudyTime % 60;
+            const studyTimeStr = `${hours}h ${minutes}m`;
+
+            setSummary({
+                totalWords: stats.totalWords,
+                masteryRate: stats.masteryRate,
+                streak: history.streak || 0,
+                studyTime: studyTimeStr,
+            });
+
+            setVocabularyStatus({
+                mastered: stats.mastered,
+                learning: stats.learning,
+                review: stats.review,
+            });
+
+            const formattedRecent = recent.map((w) => {
+                let date = "Unknown";
+                if (w.lastReviewed) {
+                    date = w.lastReviewed.split("T")[0];
+                } else if (w.createdAt) {
+                    date = w.createdAt.split("T")[0];
+                }
+                return {
+                    word: w.word || "Unknown",
+                    status: w.status === "mastered" ? "Mastered" : w.status === "learning" ? "Learning" : "Review",
+                    date: date,
+                };
+            });
+
+            setRecentWords(formattedRecent);
+        } catch (error) {
+            showError("Failed to load progress data. Please try again.");
+            if (__DEV__) {
+                console.error("Load progress data error:", error);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const filterWords = () => {
+        let filtered = recentWords || [];
+
+        if (search && search.trim()) {
+            const lowerSearch = search.toLowerCase();
+            filtered = filtered.filter(
+                (w) =>
+                    (w.word && w.word.toLowerCase().includes(lowerSearch)) ||
+                    (w.status && w.status.toLowerCase().includes(lowerSearch))
+            );
+        }
+
+        if (filterStatus !== "All") {
+            filtered = filtered.filter((w) => w && w.status === filterStatus);
+        }
+
+        setFilteredWords(filtered);
+    };
+
+    const handleSearch = () => {
+        filterWords();
+    };
+
+    if (loading) {
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#6C4AB6" />
+                <Text style={styles.loadingText}>Loading progress...</Text>
+            </View>
+        );
+    }
 
     return (
         <ScrollView style={styles.container}>
@@ -167,7 +258,7 @@ export default function ProgressScreen() {
                     />
                     <TouchableOpacity
                         style={styles.searchBtn}
-                        onPress={() => console.log("Search:", search)}
+                        onPress={handleSearch}
                     >
                         <IconWithFallback name="search" size={22} color="#fff" useEmoji={true} />
                     </TouchableOpacity>
@@ -178,11 +269,11 @@ export default function ProgressScreen() {
             <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Recently Learned</Text>
 
-                {recentWords
-                    .filter((w) =>
-                        filterStatus === "All" ? true : w.status === filterStatus
-                    )
-                    .map((w, i) => (
+                {filteredWords.length === 0 && search && (
+                    <Text style={styles.noResults}>No words found matching your search.</Text>
+                )}
+
+                {filteredWords.map((w, i) => (
                         <View key={i} style={styles.wordRow}>
                             <View>
                                 <Text style={styles.word}>{w.word}</Text>
@@ -305,6 +396,23 @@ function renderProgressBar(label, value, color) {
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: "#fff" },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#fff",
+    },
+    loadingText: {
+        marginTop: 10,
+        color: "#777",
+        fontSize: 14,
+    },
+    noResults: {
+        textAlign: "center",
+        color: "#999",
+        marginTop: 20,
+        fontSize: 14,
+    },
 
     header: {
         backgroundColor: "#6C4AB6",

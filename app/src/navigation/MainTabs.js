@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import IconWithFallback from "../components/IconWithFallback";
 
 import HomeScreen from "../screen/HomeScreen";
-import LearnScreen from "../screen/LearnScreen";
+import LearningStack from "./LearningStack";
 import ProgressScreen from "../screen/ProgressScreen";
 import ProfileStack from "./ProfileStack";
 
@@ -39,7 +39,7 @@ export default function MainTabs() {
             })}
         >
             <Tab.Screen name="Home" component={HomeScreen} />
-            <Tab.Screen name="Learn" component={LearnScreen} />
+            <Tab.Screen name="Learn" component={LearningStack} />
             <Tab.Screen name="Progress" component={ProgressScreen} />
             <Tab.Screen name="Profile" component={ProfileStack} />
         </Tab.Navigator>
