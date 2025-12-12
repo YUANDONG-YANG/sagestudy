@@ -38,13 +38,13 @@ export default function HomeScreen({ navigation }) {
     const loadStats = async () => {
         try {
             setLoading(true);
-            // 使用API获取数据
+            // Fetch data using API
             const studyStats = await VocabularyAPI.getStudyStats();
             const history = await VocabularyAPI.getStudyHistory();
             const reviewWords = await VocabularyAPI.getWordsForReview();
             const learningWords = await VocabularyAPI.getWordsByStatus("learning");
 
-            // 计算今天的进度
+            // Calculate today's progress
             const today = new Date().toISOString().split("T")[0];
             const todayCount = (history && history.dailyWordsLearned && history.dailyWordsLearned[today]) 
                 ? history.dailyWordsLearned[today] 
@@ -71,7 +71,7 @@ export default function HomeScreen({ navigation }) {
             showError("Please enter a word to search.");
             return;
         }
-        // 导航到Progress页面并传递搜索参数
+        // Navigate to Progress page and pass search query
         navigation.navigate("Progress", { searchQuery: searchValue.trim() });
     };
 
@@ -163,7 +163,7 @@ export default function HomeScreen({ navigation }) {
                 <TouchableOpacity
                     style={styles.modeCard}
                     onPress={() => {
-                        // 导航到Learn tab的LearnMain屏幕
+                        // Navigate to LearnMain screen in Learn tab
                         navigation.navigate("Learn", { screen: "LearnMain" });
                     }}
                 >
@@ -183,7 +183,7 @@ export default function HomeScreen({ navigation }) {
                 <TouchableOpacity
                     style={styles.modeCard}
                     onPress={() => {
-                        // 先导航到Learn tab，然后导航到Review
+                        // First navigate to Learn tab, then navigate to Review
                         navigation.navigate("Learn", { screen: "Review" });
                     }}
                 >
@@ -203,7 +203,7 @@ export default function HomeScreen({ navigation }) {
                 <TouchableOpacity
                     style={styles.modeCard}
                     onPress={() => {
-                        // 先导航到Learn tab，然后导航到Test
+                        // First navigate to Learn tab, then navigate to Test
                         navigation.navigate("Learn", { screen: "Test" });
                     }}
                 >

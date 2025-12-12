@@ -16,13 +16,13 @@ const MyTheme = {
     },
 };
 
-// 创建导航ref，用于通知点击后导航
+// Create navigation ref for navigation after notification click
 export const navigationRef = React.createRef();
 
 export default function AppNavigator() {
     useEffect(() => {
-        // 通知点击处理将在Notifications.js中通过navigationRef实现
-        // 这里只需要确保navigationRef可用
+        // Notification click handling will be implemented in Notifications.js via navigationRef
+        // Just ensure navigationRef is available here
     }, []);
 
     return (

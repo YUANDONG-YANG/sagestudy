@@ -48,7 +48,7 @@ const languages = {
 export function ThemeProvider({ children }) {
     const [theme, setTheme] = useState("light");
     const [language, setLanguage] = useState("en");
-    const [loading, setLoading] = useState(false); // 初始化为false，避免阻塞渲染
+    const [loading, setLoading] = useState(false); // Initialize as false to avoid blocking render
 
     const loadSettings = async () => {
         try {
@@ -72,11 +72,11 @@ export function ThemeProvider({ children }) {
     };
 
     useEffect(() => {
-        // 异步加载设置，不阻塞初始渲染
+        // Load settings asynchronously, don't block initial render
         loadSettings();
     }, []);
 
-    // 确保即使加载失败也提供默认值
+    // Ensure default values are provided even if loading fails
     const currentTheme = themes[theme] || themes.light;
     const currentLanguage = languages[language] || languages.en;
 

@@ -21,7 +21,7 @@ export default function TaskListScreen({ navigation }) {
 
     useEffect(() => {
         const unsubscribe = navigation.addListener("focus", loadTasks);
-        loadTasks(); // 初始加载
+        loadTasks(); // Initial load
         return unsubscribe;
     }, [navigation]);
 
@@ -78,7 +78,7 @@ export default function TaskListScreen({ navigation }) {
         <View style={styles.container}>
             <PurpleHeader title="My Tasks" onBack={() => navigation.goBack()} />
 
-            {/* 空状态 */}
+            {/* Empty state */}
             {tasks.length === 0 && (
                 <EmptyState
                     title="No tasks yet"
@@ -86,7 +86,7 @@ export default function TaskListScreen({ navigation }) {
                 />
             )}
 
-            {/* 列表 */}
+            {/* List */}
             <FlatList
                 data={tasks}
                 keyExtractor={(item) => item.id}
@@ -98,7 +98,7 @@ export default function TaskListScreen({ navigation }) {
                 initialNumToRender={10}
             />
 
-            {/* FAB 按钮 */}
+            {/* FAB button */}
             <TouchableOpacity
                 style={styles.fab}
                 onPress={() => navigation.navigate("AddTask")}

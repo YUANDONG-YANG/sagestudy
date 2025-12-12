@@ -21,7 +21,7 @@ export default function AddTaskScreen({ navigation }) {
     const [showDuePicker, setShowDuePicker] = useState(false);
 
     /* -----------------------------
-     * 保存任务
+     * Save Task
      * ----------------------------- */
     const handleSave = async () => {
         if (!title.trim()) {
@@ -45,7 +45,7 @@ export default function AddTaskScreen({ navigation }) {
             await saveTask(newTask);
 
             /* -----------------------------
-             * 🔔 自动调度通知
+             * 🔔 Auto-schedule Notification
              * ----------------------------- */
             const notifyDate = calculateNotificationDate(newTask.dueDate, reminderOffset);
             if (notifyDate) {

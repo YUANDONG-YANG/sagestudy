@@ -1,15 +1,15 @@
 /**
- * 词汇学习相关API
+ * Vocabulary learning related API
  */
 import apiClient from "../apiClient";
 import VocabularyStorage from "../../data/learning/VocabularyStorage";
 
 /**
- * 词汇API服务
+ * Vocabulary API service
  */
 class VocabularyAPI {
     /**
-     * 获取所有词汇
+     * Get all vocabulary words
      */
     async getAllWords() {
         const apiResponse = await apiClient.get("/vocabulary");
@@ -19,13 +19,13 @@ class VocabularyAPI {
             return await VocabularyStorage.getAllWords();
         }
 
-        // 实际应用中，这里会返回API数据
-        // 现在返回本地数据
+        // In actual application, this would return API data
+        // Currently returning local data
         return await VocabularyStorage.getAllWords();
     }
 
     /**
-     * 获取单个词汇
+     * Get single vocabulary word
      */
     async getWordById(wordId) {
         const apiResponse = await apiClient.get(`/vocabulary/${wordId}`);
@@ -38,17 +38,17 @@ class VocabularyAPI {
     }
 
     /**
-     * 添加词汇
+     * Add vocabulary word
      */
     async addWord(wordData) {
         const apiResponse = await apiClient.post("/vocabulary", wordData);
         
         if (!apiResponse.success) {
-            // 即使API失败，也保存到本地
+            // Save to local even if API fails
             return await VocabularyStorage.addWord(wordData);
         }
 
-        // 保存到本地存储
+        // Save to local storage
         return await VocabularyStorage.addWord(wordData);
     }
 
@@ -97,23 +97,23 @@ class VocabularyAPI {
     }
 
     /**
-     * 更新单词进度（通用方法，可以更新任意字段）
+     * Update word progress (generic method, can update any field)
      */
     async updateWordProgress(wordId, updates) {
         try {
-            // 获取当前单词
+            // Get current word
             const word = await VocabularyStorage.getWordById(wordId);
             if (!word) {
                 throw new Error("Word not found");
             }
 
-            // 合并更新
+            // Merge updates
             const updatedWord = { ...word, ...updates };
             
-            // 调用API
+            // Call API
             const apiResponse = await apiClient.put(`/vocabulary/${wordId}`, updatedWord);
             
-            // 无论API成功与否，都更新本地存储
+            // Update local storage regardless of API success
             return await VocabularyStorage.updateWord(updatedWord);
         } catch (error) {
             if (__DEV__) {
@@ -124,7 +124,7 @@ class VocabularyAPI {
     }
 
     /**
-     * 搜索词汇
+     * Search vocabulary words
      */
     async searchWords(query) {
         const apiResponse = await apiClient.get(`/vocabulary/search?q=${encodeURIComponent(query)}`);
@@ -137,7 +137,7 @@ class VocabularyAPI {
     }
 
     /**
-     * 获取学习统计
+     * Get learning statistics
      */
     async getStudyStats() {
         const apiResponse = await apiClient.get("/vocabulary/stats");
@@ -150,7 +150,7 @@ class VocabularyAPI {
     }
 
     /**
-     * 获取学习历史
+     * Get learning history
      */
     async getStudyHistory() {
         const apiResponse = await apiClient.get("/vocabulary/history");
@@ -163,7 +163,7 @@ class VocabularyAPI {
     }
 
     /**
-     * 更新学习历史
+     * Update learning history
      */
     async updateStudyHistory(minutesStudied, wordsLearned) {
         const apiResponse = await apiClient.post("/vocabulary/history", {
@@ -181,7 +181,7 @@ class VocabularyAPI {
     }
 
     /**
-     * 根据状态获取词汇
+     * Get words by status
      */
     async getWordsByStatus(status) {
         const apiResponse = await apiClient.get(`/vocabulary?status=${status}`);
@@ -194,7 +194,7 @@ class VocabularyAPI {
     }
 
     /**
-     * 获取需要复习的词汇
+     * Get words for review
      */
     async getWordsForReview() {
         const apiResponse = await apiClient.get("/vocabulary/review");
@@ -207,7 +207,7 @@ class VocabularyAPI {
     }
 
     /**
-     * 获取最近学习的词汇
+     * Get recently learned words
      */
     async getRecentWords(limit = 10) {
         const apiResponse = await apiClient.get(`/vocabulary/recent?limit=${limit}`);
@@ -232,7 +232,7 @@ class VocabularyAPI {
                 .slice(0, limit);
         }
 
-        // 返回本地数据（实际应用中返回API数据）
+        // Return local data (would return API data in actual application)
         const words = await VocabularyStorage.getAllWords();
         return words
             .filter((w) => w && w.lastReviewed)

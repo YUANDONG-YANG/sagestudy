@@ -1,29 +1,29 @@
-# 修复图标显示为X的问题
+# Fix Icon Display as X Issue
 
-## 问题原因
-`react-native-vector-icons` 的字体文件没有正确链接到项目中。
+## Problem Cause
+The font files for `react-native-vector-icons` are not correctly linked to the project.
 
-## 解决方案
+## Solutions
 
-### 方法1：使用Emoji备用图标（快速方案，已实现）
-我已经创建了 `IconWithFallback` 组件，它会自动在图标加载失败时显示emoji。
+### Method 1: Use Emoji Fallback Icons (Quick Solution, Already Implemented)
+I have created the `IconWithFallback` component that automatically displays emoji when icon loading fails.
 
-### 方法2：修复原生配置（推荐）
+### Method 2: Fix Native Configuration (Recommended)
 
-#### Android 修复步骤：
+#### Android Fix Steps:
 
-1. **检查字体文件是否存在**
+1. **Check if font files exist**
    ```bash
    ls node_modules/react-native-vector-icons/Fonts/
    ```
-   应该看到 `MaterialIcons.ttf` 等文件
+   You should see files like `MaterialIcons.ttf`
 
-2. **重新链接资源**
+2. **Re-link assets**
    ```bash
    npx react-native-asset
    ```
 
-3. **清理并重新构建**
+3. **Clean and rebuild**
    ```bash
    cd android
    ./gradlew clean
@@ -31,22 +31,22 @@
    npm run android
    ```
 
-#### iOS 修复步骤：
+#### iOS Fix Steps:
 
-1. **在Xcode中手动添加字体**
-   - 打开 `ios/MyFirstApp.xcworkspace`
-   - 在项目导航器中，右键点击 `MyFirstApp` 文件夹
-   - 选择 "Add Files to MyFirstApp"
-   - 导航到 `node_modules/react-native-vector-icons/Fonts/`
-   - 选择所有 `.ttf` 文件
-   - 确保 "Copy items if needed" 已勾选
-   - 确保 "Add to targets: MyFirstApp" 已勾选
-   - 点击 "Add"
+1. **Manually add fonts in Xcode**
+   - Open `ios/MyFirstApp.xcworkspace`
+   - In project navigator, right-click `MyFirstApp` folder
+   - Select "Add Files to MyFirstApp"
+   - Navigate to `node_modules/react-native-vector-icons/Fonts/`
+   - Select all `.ttf` files
+   - Ensure "Copy items if needed" is checked
+   - Ensure "Add to targets: MyFirstApp" is checked
+   - Click "Add"
 
-2. **验证 Info.plist**
-   我已经更新了 `Info.plist`，添加了字体配置。
+2. **Verify Info.plist**
+   I have updated `Info.plist` with font configuration.
 
-3. **重新构建**
+3. **Rebuild**
    ```bash
    cd ios
    pod install
@@ -54,23 +54,23 @@
    npm run ios
    ```
 
-### 方法3：使用备用图标组件（临时方案）
+### Method 3: Use Fallback Icon Component (Temporary Solution)
 
-如果原生配置修复困难，可以临时使用emoji图标：
+If native configuration is difficult to fix, temporarily use emoji icons:
 
-1. 将所有 `Icon` 组件替换为 `IconWithFallback`
-2. 设置 `useEmoji={true}` 强制使用emoji
+1. Replace all `Icon` components with `IconWithFallback`
+2. Set `useEmoji={true}` to force emoji usage
 
-## 当前状态
+## Current Status
 
-- ✅ 已创建 `IconWithFallback` 组件
-- ✅ 已更新 Android build.gradle
-- ✅ 已更新 iOS Info.plist
-- ⚠️ 需要重新构建应用才能生效
+- ✅ Created `IconWithFallback` component
+- ✅ Updated Android build.gradle
+- ✅ Updated iOS Info.plist
+- ⚠️ Need to rebuild app for changes to take effect
 
-## 下一步
+## Next Steps
 
-运行以下命令重新构建：
+Run the following commands to rebuild:
 ```bash
 # Android
 npm run android
@@ -78,5 +78,3 @@ npm run android
 # iOS  
 npm run ios
 ```
-
-

@@ -3,17 +3,17 @@ import { Text, View, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
 /**
- * 带emoji备用的图标组件
- * 如果图标加载失败，自动显示emoji
+ * Icon component with emoji fallback
+ * Automatically displays emoji if icon loading fails
  */
 const iconEmojiMap = {
-    // 导航图标
+    // Navigation icons
     "home": "🏠",
     "menu-book": "📚",
     "bar-chart": "📊",
     "person": "👤",
     
-    // 常用图标
+    // Common icons
     "search": "🔍",
     "arrow-back": "←",
     "close": "✕",
@@ -52,11 +52,11 @@ export default function IconWithFallback({
     size = 24, 
     color = "#6C4AB6", 
     style,
-    useEmoji = true // 默认使用emoji，避免图标加载问题
+    useEmoji = true // Default to emoji to avoid icon loading issues
 }) {
     const emoji = iconEmojiMap[name] || "•";
     
-    // 如果强制使用emoji，直接显示emoji
+    // If forced to use emoji, display emoji directly
     if (useEmoji) {
         return (
             <Text style={[{ fontSize: size * 0.85, color, textAlign: 'center' }, style]}>
@@ -65,7 +65,7 @@ export default function IconWithFallback({
         );
     }
     
-    // 尝试使用图标，如果失败则回退到emoji
+    // Try to use icon, fallback to emoji if it fails
     try {
         return (
             <Icon
@@ -76,7 +76,7 @@ export default function IconWithFallback({
             />
         );
     } catch (error) {
-        // 如果图标加载失败，显示emoji
+        // If icon loading fails, display emoji
         return (
             <Text style={[{ fontSize: size * 0.85, color, textAlign: 'center' }, style]}>
                 {emoji}

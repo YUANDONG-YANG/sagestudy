@@ -1,5 +1,5 @@
 /**
- * 初始词汇数据
+ * Initial vocabulary data
  */
 export const INITIAL_WORDS = [
     {
@@ -114,7 +114,7 @@ export async function initializeWords() {
         const words = await VocabularyStorage.getAllWords();
         
         if (words.length === 0) {
-            // 首次使用，添加初始词汇
+            // First time use, add initial vocabulary
             for (const wordData of INITIAL_WORDS) {
                 try {
                     await VocabularyStorage.addWord(wordData);
@@ -122,7 +122,7 @@ export async function initializeWords() {
                     if (__DEV__) {
                         console.error(`Error adding initial word ${wordData.word}:`, error);
                     }
-                    // 继续添加其他词汇，不中断整个过程
+                    // Continue adding other words without interrupting the whole process
                 }
             }
         }
@@ -130,7 +130,7 @@ export async function initializeWords() {
         if (__DEV__) {
             console.error("Error initializing words:", error);
         }
-        // 不抛出错误，允许应用继续运行
+        // Don't throw error, allow app to continue running
     }
 }
 

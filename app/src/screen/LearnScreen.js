@@ -49,10 +49,10 @@ export default function LearnScreen({ navigation }) {
     const loadWords = async () => {
         try {
             setLoading(true);
-            // 初始化词汇（如果需要）
+            // Initialize vocabulary if needed
             await initializeWords();
 
-            // 使用API获取词汇
+            // Fetch vocabulary using API
             const allWords = await VocabularyAPI.getAllWords();
             const learningWords = allWords.filter(
                 (w) => w.status === "learning" || !w.lastReviewed
@@ -60,8 +60,8 @@ export default function LearnScreen({ navigation }) {
 
             let wordsToSet = [];
             if (learningWords.length === 0) {
-                // 如果没有学习中的词汇，从所有词汇中选择
-                wordsToSet = allWords.slice(0, 12); // 最多12个词汇
+                // If no learning words, select from all words
+                wordsToSet = allWords.slice(0, 12); // Maximum 12 words
             } else {
                 wordsToSet = learningWords.slice(0, 12);
             }
@@ -73,7 +73,7 @@ export default function LearnScreen({ navigation }) {
             }
             
             setWordsToLearn(wordsToSet);
-            setCurrentIndex(0); // 重置索引
+            setCurrentIndex(0); // Reset index
         } catch (error) {
             showError("Failed to load words. Please try again.");
             if (__DEV__) {
@@ -92,12 +92,12 @@ export default function LearnScreen({ navigation }) {
         setDifficulty(word.difficulty || "medium");
         setSelectedOption(null);
 
-        // 生成选项（包括正确答案和其他3个随机单词）
+        // Generate options (including correct answer and 3 other random words)
         generateOptions(word);
     };
 
     const generateOptions = (word) => {
-        // 这里简化处理，实际应该从词汇库中选择相关单词
+        // Simplified here, should actually select related words from vocabulary library
         const wrongOptions = ["Banana", "Orange", "Grapes"];
         const allOptions = [
             { label: word.word, correct: true },
@@ -106,7 +106,7 @@ export default function LearnScreen({ navigation }) {
             { label: wrongOptions[2], correct: false },
         ];
 
-        // 随机打乱选项
+        // Randomly shuffle options
         const shuffled = allOptions.sort(() => Math.random() - 0.5);
         setOptions(shuffled);
     };
@@ -116,13 +116,13 @@ export default function LearnScreen({ navigation }) {
 
         setSaving(true);
         try {
-            // 保存完整的学习进度，包括难度、信心等级、笔记等
+            // Save complete learning progress, including difficulty, confidence level, notes, etc.
             await VocabularyAPI.updateWordProgress(currentWord.id, {
                 difficulty: difficulty,
                 confidence: confidence,
                 notes: notes,
                 lastReviewed: new Date().toISOString(),
-                // 如果信心等级很高，更新状态
+                // If confidence level is high, update status
                 status: confidence >= 4 ? "mastered" : confidence >= 3 ? "learning" : "review",
             });
 

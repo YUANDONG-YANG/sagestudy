@@ -15,8 +15,8 @@ export default function PlannerStack() {
         <Stack.Navigator
             initialRouteName="TaskList"
             screenOptions={{
-                headerShown: false, // 全部使用 PurpleHeader，而不是默认头部
-                animation: "slide_from_right", // 统一专业动画
+                headerShown: false, // Use PurpleHeader for all screens instead of default header
+                animation: "slide_from_right", // Unified professional animation
             }}
         >
             {/* Main Planner Screens */}

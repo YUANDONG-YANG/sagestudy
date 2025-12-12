@@ -1,5 +1,5 @@
 /**
- * 认证相关API
+ * Authentication related API
  */
 import apiClient from "../apiClient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -12,14 +12,14 @@ const STORAGE_KEYS = {
 };
 
 /**
- * 认证API服务
+ * Authentication API service
  */
 class AuthAPI {
     /**
-     * 用户注册
+     * User registration
      */
     async register(fullName, email, password) {
-        // 本地验证（先验证，再调用API）
+        // Local validation (validate first, then call API)
         const nameValidation = validateName(fullName);
         if (!nameValidation.valid) {
             return { success: false, message: nameValidation.message };
@@ -35,7 +35,7 @@ class AuthAPI {
             return { success: false, message: passwordValidation.message };
         }
 
-        // 模拟API调用（不影响实际注册逻辑）
+        // Simulate API call (doesn't affect actual registration logic)
         try {
             await apiClient.post("/auth/register", {
                 fullName,
@@ -43,13 +43,13 @@ class AuthAPI {
                 password,
             });
         } catch (error) {
-            // API调用失败不影响注册，继续执行
+            // API call failure doesn't affect registration, continue execution
             if (__DEV__) {
                 console.warn("API call failed, continuing with local registration:", error);
             }
         }
 
-        // 检查用户是否已存在
+        // Check if user already exists
         const usersData = await this.getAllUsers();
         const existingUser = usersData.find((u) => u.email.toLowerCase() === email.toLowerCase());
 
@@ -57,7 +57,7 @@ class AuthAPI {
             return { success: false, message: "User with this email already exists" };
         }
 
-        // 创建新用户
+        // Create new user
         const newUser = {
             id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
             fullName: fullName.trim(),
@@ -69,7 +69,7 @@ class AuthAPI {
         usersData.push(newUser);
         await AsyncStorage.setItem(STORAGE_KEYS.USERS_DATA, JSON.stringify(usersData));
 
-        // 生成token
+        // Generate token
         const token = `token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         await AsyncStorage.setItem(STORAGE_KEYS.USER_TOKEN, token);
         await AsyncStorage.setItem(
@@ -92,10 +92,10 @@ class AuthAPI {
     }
 
     /**
-     * 用户登录（模拟登录，无需真实验证）
+     * User login (simulated login, no real validation required)
      */
     async login(email, password) {
-        // 基础验证
+        // Basic validation
         if (!email || !password) {
             return { success: false, message: "Email and password are required" };
         }
@@ -105,25 +105,25 @@ class AuthAPI {
             return { success: false, message: "Invalid email format" };
         }
 
-        // 模拟API调用
+        // Simulate API call
         try {
             await apiClient.post("/auth/login", { email, password });
         } catch (error) {
-            // API调用失败不影响登录
+            // API call failure doesn't affect login
             if (__DEV__) {
                 console.warn("API call failed, continuing with simulated login:", error);
             }
         }
 
-        // 模拟登录：查找或创建用户
+        // Simulated login: find or create user
         const usersData = await this.getAllUsers();
         let user = usersData.find(
             (u) => u.email.toLowerCase() === email.toLowerCase()
         );
 
-        // 如果用户不存在，自动创建一个模拟用户
+        // If user doesn't exist, automatically create a simulated user
         if (!user) {
-            // 安全地从邮箱提取名字
+            // Safely extract name from email
             let displayName = "User";
             try {
                 const emailParts = email.split('@');
@@ -132,7 +132,7 @@ class AuthAPI {
                     displayName = emailName.charAt(0).toUpperCase() + emailName.slice(1);
                 }
             } catch (e) {
-                // 如果提取失败，使用默认名字
+                // If extraction fails, use default name
                 if (__DEV__) {
                     console.warn("Failed to extract name from email:", e);
                 }
@@ -142,16 +142,16 @@ class AuthAPI {
                 id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
                 fullName: displayName,
                 email: email.trim().toLowerCase(),
-                password: password, // 保存密码以便后续使用
+                password: password, // Save password for later use
                 createdAt: new Date().toISOString(),
             };
 
-            // 保存新用户
+            // Save new user
             usersData.push(user);
             await AsyncStorage.setItem(STORAGE_KEYS.USERS_DATA, JSON.stringify(usersData));
         }
 
-        // 生成token并保存
+        // Generate token and save
         const token = `token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         await AsyncStorage.setItem(STORAGE_KEYS.USER_TOKEN, token);
         await AsyncStorage.setItem(
@@ -171,7 +171,7 @@ class AuthAPI {
     }
 
     /**
-     * 修改密码
+     * Change password
      */
     async changePassword(email, oldPassword, newPassword) {
         const apiResponse = await apiClient.post("/auth/change-password", {

@@ -70,7 +70,7 @@ export default function TaskDetailScreen({ route, navigation }) {
 
             await updateTask(updated);
 
-            // 取消该任务的所有通知
+            // Cancel all notifications for this task
             await NotificationServiceInstance.cancelTaskNotifications(updated.id);
 
         if (!updated.completed) {
@@ -109,10 +109,10 @@ export default function TaskDetailScreen({ route, navigation }) {
 
             await updateTask(updated);
 
-            // 完成任务 → 取消通知
+            // Complete task → cancel notification
             await NotificationServiceInstance.cancelTaskNotifications(updated.id);
 
-        // 恢复任务 → 重新调度通知
+        // Restore task → reschedule notification
         if (!updated.completed) {
             const reminderOffset = await getReminderOffset();
             const notifyDate = calculateNotificationDate(updated.dueDate, reminderOffset);
@@ -154,7 +154,7 @@ export default function TaskDetailScreen({ route, navigation }) {
         try {
             await deleteTask(task.id);
 
-            // 取消该任务的所有通知
+            // Cancel all notifications for this task
             await NotificationServiceInstance.cancelTaskNotifications(task.id);
 
             navigation.goBack();

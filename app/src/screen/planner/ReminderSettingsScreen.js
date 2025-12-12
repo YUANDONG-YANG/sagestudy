@@ -38,7 +38,7 @@ export default function ReminderSettingsScreen({ navigation }) {
         try {
             await AsyncStorage.setItem(REMINDER_KEY, String(selected));
             
-            // 重新调度所有任务的通知（使用新设置）
+            // Reschedule notifications for all tasks (using new settings)
             const count = await NotificationServiceInstance.rescheduleAllTaskNotifications(
                 getReminderOffset,
                 getAllTasks,

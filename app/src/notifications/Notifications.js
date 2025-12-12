@@ -6,7 +6,7 @@ import { navigationRef } from "../navigation/AppNavigator";
 const NOTIFICATION_IDS_KEY = "NOTIFICATION_IDS_MAP";
 
 class NotificationService {
-    // 通知ID到任务ID的映射（用于管理通知）
+    // Map from notification ID to task ID (for managing notifications)
     notificationIdMap = new Map();
 
     constructor() {
@@ -14,7 +14,7 @@ class NotificationService {
     }
 
     /* -----------------------------
-     * 加载通知ID映射
+     * Load Notification ID Mapping
      * ----------------------------- */
     async loadNotificationIds() {
         try {
@@ -31,7 +31,7 @@ class NotificationService {
     }
 
     /* -----------------------------
-     * 保存通知ID映射
+     * Save Notification ID Mapping
      * ----------------------------- */
     async saveNotificationIds() {
         try {
@@ -45,11 +45,11 @@ class NotificationService {
     }
 
     /* -----------------------------
-     * ANDROID 13+ 权限请求
+     * ANDROID 13+ Permission Request
      * ----------------------------- */
     async requestPermissions() {
         if (Platform.OS === "ios") {
-            // iOS权限请求
+            // iOS permission request
             try {
                 const authStatus = await Notifications.ios.checkPermissions();
                 if (authStatus === Notifications.ios.PermissionStatus.Authorized) {
@@ -95,14 +95,14 @@ class NotificationService {
      * ----------------------------- */
     registerListeners() {
         try {
-            // 注册成功（接收 token）
+            // Registration successful (receive token)
             Notifications.events().registerRemoteNotificationsRegistered((event) => {
                 if (__DEV__) {
                     console.log("📲 Device Push Token:", event.deviceToken);
                 }
             });
 
-            // 注册失败
+            // Registration failed
             Notifications.events().registerRemoteNotificationsRegistrationFailed(
                 (event) => {
                     if (__DEV__) {
@@ -111,23 +111,23 @@ class NotificationService {
                 }
             );
 
-            // 点击通知
+            // Notification clicked
             Notifications.events().registerNotificationOpened(
                 (notification, completion) => {
                     if (__DEV__) {
                         console.log("🔔 Notification opened:", notification);
                     }
                     
-                    // 处理通知点击后的导航
+                    // Handle navigation after notification click
                     const payload = notification.payload || notification.extra || {};
                     const taskId = payload.taskId;
 
                     if (taskId && navigationRef.current) {
-                        // 延迟导航，确保导航容器已准备好
+                        // Delay navigation to ensure navigation container is ready
                         setTimeout(() => {
                             try {
-                                // 导航到TaskDetail屏幕
-                                // 路径: MainTabs -> Profile -> PlannerStack -> TaskDetail
+                                // Navigate to TaskDetail screen
+                                // Path: MainTabs -> Profile -> PlannerStack -> TaskDetail
                                 navigationRef.current?.navigate("MainTabs", {
                                     screen: "Profile",
                                     params: {
@@ -150,7 +150,7 @@ class NotificationService {
                 }
             );
 
-            // 收到通知
+            // Notification received
             Notifications.events().registerNotificationReceivedForeground(
                 (notification, completion) => {
                     if (__DEV__) {
@@ -197,14 +197,14 @@ class NotificationService {
                 return null;
             }
 
-            // 生成唯一通知ID
+            // Generate unique notification ID
             const notificationId = `${payload.taskId || 'task'}_${date.getTime()}`;
             
             Notifications.postLocalNotification({
-                identifier: notificationId, // 使用identifier以便后续取消
+                identifier: notificationId, // Use identifier for later cancellation
                 title,
                 body,
-                fireDate: date.getTime(), // 毫秒时间戳
+                fireDate: date.getTime(), // Timestamp in milliseconds
                 sound: "default",
                 silent: false,
                 extra: {
@@ -213,7 +213,7 @@ class NotificationService {
                 },
             });
 
-            // 保存通知ID映射
+            // Save notification ID mapping
             if (payload.taskId) {
                 this.notificationIdMap.set(notificationId, payload.taskId);
                 this.saveNotificationIds();

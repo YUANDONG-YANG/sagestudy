@@ -33,7 +33,7 @@ export default function ProgressScreen({ route }) {
     const [filterDays, setFilterDays] = useState("7");
     const [loading, setLoading] = useState(true);
 
-    // 每周活动数据（简化版本，可以后续增强）
+    // Weekly activity data (simplified version, can be enhanced later)
     const weeklyActivity = [
         { day: "M", value: 2 },
         { day: "T", value: 5 },
@@ -60,7 +60,7 @@ export default function ProgressScreen({ route }) {
     useFocusEffect(
         useCallback(() => {
             loadData();
-            // 如果从HomeScreen传递了搜索参数，设置搜索框
+            // If search query is passed from HomeScreen, set search box
             if (route?.params?.searchQuery) {
                 setSearch(route.params.searchQuery);
             }
@@ -74,12 +74,12 @@ export default function ProgressScreen({ route }) {
     const loadData = async () => {
         try {
             setLoading(true);
-            // 使用API获取数据
+            // Fetch data using API
             const stats = await VocabularyAPI.getStudyStats();
             const history = await VocabularyAPI.getStudyHistory();
             const recent = await VocabularyAPI.getRecentWords(10);
 
-            // 格式化学习时间
+            // Format learning time
             const hours = Math.floor(history.totalStudyTime / 60);
             const minutes = history.totalStudyTime % 60;
             const studyTimeStr = `${hours}h ${minutes}m`;
