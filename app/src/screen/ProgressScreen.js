@@ -60,7 +60,11 @@ export default function ProgressScreen({ route }) {
     useFocusEffect(
         useCallback(() => {
             loadData();
-        }, [])
+            // 如果从HomeScreen传递了搜索参数，设置搜索框
+            if (route?.params?.searchQuery) {
+                setSearch(route.params.searchQuery);
+            }
+        }, [route?.params?.searchQuery])
     );
 
     useEffect(() => {
